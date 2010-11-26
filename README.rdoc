@@ -1,5 +1,5 @@
-﻿= roodo-cas-server 0.5
-by roodo.com ( http://www.roodo.com )
+= roodo-cas-server 0.5
+by roodo.com ( http://www.roodo.com 
 
 == LINKS:
 
