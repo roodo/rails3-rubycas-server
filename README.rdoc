@@ -3,7 +3,7 @@ by roodo.com ( http://www.roodo.com )
 
 == LINKS:
 
-* {github}[https://wuhsien@github.com/wuhsien/roodo-cas-server.git]
+* {github}[https://github.com/wuhsien/roodo-cas-server]
 
 == DESCRIPTION:
 
