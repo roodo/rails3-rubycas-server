@@ -1,6 +1,14 @@
 = roodo-cas-server 0.5
-by roodo.com ( http://www.roodo.com 
+by roodo.com ( http://www.roodo.com )
 
 == LINKS:
 
 * {github}[https://wuhsien@github.com/wuhsien/roodo-cas-server.git]
+
+== DESCRIPTION:
+
+== REQUIREMENTS:
+
+== INSTALL:
+
+== LICENSE:
