@@ -1,19 +1,19 @@
 <div id="left-splash">
-  <%= form_tag("/login") do %>
+  <%= form_tag "/login" do %>
     <div>
-      <label for="email">Account / Email:</label>
-      <input type="text" id="email" name="email" tabIndex="1" />
+      <%= label_tag "email", "Account / Email" %>
+      <%= text_field_tag "email", nil, {:tabIndex => 1} %>
     </div>
     <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" tabIndex="2" />
+      <%= label_tag "password", "Password" %>
+      <%= password_field_tag "password", nil, {:tabIndex => 2} %>
     </div>
     <div>
       <%= check_box_tag "remember-me", "on", false, {:tabIndex => 3} %>
-      <label for="remember-me" id="remember-me">Remeber me for 14 days</label>
+      <%= label_tag "remember-me", "Remeber me for 14 days", {:id => "remember-me"} %>
     </div>
     <div id="signup-submit">
-      <input type="submit" id="submit" name="submit" tabIndex="4" value="Login" />
+      <%= submit_tag "Login" %>
     </div>
   <% end %>
 </div>
