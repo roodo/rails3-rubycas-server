@@ -1,2 +1,23 @@
-<h1>Server#index</h1>
-<p>Find me in app/views/server/index.html.erb</p>
+<div id="left-splash">
+  <%= form_tag("/login") do %>
+    <div>
+      <label for="email">Account / Email:</label>
+      <input type="text" id="email" name="email" tabIndex="1" />
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" tabIndex="2" />
+    </div>
+    <div id="signup-submit">
+      <input type="submit" id="submit" name="submit" tabIndex="3" value="Login" />
+    </div>
+  <% end %>
+</div>
+<div id="right-splash">
+  A clone of the rubycas-server, providing a cross-domain single sign-on solution for web applications using Rails3.
+  <h2>Our Fatures</h2>
+  <ul>
+    <li>Plugable Module</li>
+    <li>With authentication module for Facebook, Google and Yahoo!</li>
+  </ul>
+</div>

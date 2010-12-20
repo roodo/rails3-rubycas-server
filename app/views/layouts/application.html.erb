@@ -9,10 +9,11 @@
   <%= csrf_meta_tag %>
 </head>
 
-<body>
+<body onload="if (document.getElementById('username')) document.getElementById('username').focus()">
   <div id="container">
     <%= yield %>
-    <div id="footer-block">
+    <div id="clear"></div>
+    <div id="footer">
       Copyright &copy; 2010, JUT Living Development Co., Ltd
     </div>
   </div>
