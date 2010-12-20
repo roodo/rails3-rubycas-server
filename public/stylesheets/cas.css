@@ -39,12 +39,25 @@ div#left-splash label{
   color: #333333;
   padding-right: 10px;
 }
-div#left-splash input[type="text"], input[type="password"] {
+div#left-splash label#remember-me{
+  font-weight: normal;
+  color: #666666;
+  font-size: 10px;
+  padding: 0 0 0 5px;
+}
+div#left-splash input[type="text"], input[type="password"], input[type="checkbox"] {
   margin-bottom: 10px;
   border: 1px solid #CCC;
   padding: 3px;
   font-weight: bold;
   color: #666;
+}
+div#left-splash div#signup-submit input[type="submit"] {
+  margin-top: 15px;
+  border: 1px solid #CCC;
+  color: #333333;
+  padding: 3px 8px 3px 8px;
+  cursor: pointer;
 }
 
 div#right-splash {

@@ -8,8 +8,12 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" tabIndex="2" />
     </div>
+    <div>
+      <%= check_box_tag "remember-me", "on", false, {:tabIndex => 3} %>
+      <label for="remember-me" id="remember-me">Remeber me for 14 days</label>
+    </div>
     <div id="signup-submit">
-      <input type="submit" id="submit" name="submit" tabIndex="3" value="Login" />
+      <input type="submit" id="submit" name="submit" tabIndex="4" value="Login" />
     </div>
   <% end %>
 </div>
