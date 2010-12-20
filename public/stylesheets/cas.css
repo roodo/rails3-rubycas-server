@@ -1,0 +1,73 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+body {
+  margin-top: 80px;
+  -x-system-font: none;
+  font-family: arial,helvetica,clean,sans-serif;
+  font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+div#clear {
+  clear: both;
+}
+
+
+
+/* container */
+div#container {
+  margin: 0 auto;
+  width: 910px;
+  border: 0px solid #CCC;
+}
+div#left-splash {
+  border: 0px solid #CCC;
+  float: left;
+  width: 350px;
+  padding: 10px 0 0 0;
+  text-align: right;
+}
+div#left-splash label{
+  font-weight: bold;
+  color: #333333;
+  padding-right: 10px;
+}
+div#left-splash input[type="text"], input[type="password"] {
+  margin-bottom: 10px;
+  border: 1px solid #CCC;
+  padding: 3px;
+  font-weight: bold;
+  color: #666;
+}
+
+div#right-splash {
+  border: 0px solid #CCC;
+  float: right;
+  width: 450px;
+  padding: 10px 0 0 50px;
+  border-left: 7px solid #D8D8D8;
+  color: #666;
+}
+div#right-splash h2 {
+  color: #333;
+}
+
+
+
+/* footer */
+div#footer {
+  width: 910px;
+  margin-top: 100px;
+  padding-top: 10px;
+  border-top: 1px solid #D8D8D8;
+  text-align: center;
+  color: #999999;
+  font-weight: bold;
+}
