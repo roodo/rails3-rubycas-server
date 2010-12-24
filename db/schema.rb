@@ -10,18 +10,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101224091003) do
+ActiveRecord::Schema.define(:version => 20101224091835) do
 
-# Could not dump table "casserver_lt" because of following ArgumentError
+# Could not dump table "casserver_lts" because of following ArgumentError
 #   invalid date
 
-# Could not dump table "casserver_pgt" because of following ArgumentError
+# Could not dump table "casserver_pgts" because of following ArgumentError
 #   invalid date
 
-# Could not dump table "casserver_st" because of following ArgumentError
+# Could not dump table "casserver_sts" because of following ArgumentError
 #   invalid date
 
-# Could not dump table "casserver_tgt" because of following ArgumentError
+# Could not dump table "casserver_tgts" because of following ArgumentError
 #   invalid date
 
 end

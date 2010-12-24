@@ -1,6 +1,9 @@
-class CasserverSt < ActiveRecord::Migration
+#encoding: utf-8
+
+
+class CreateCasserverSts < ActiveRecord::Migration
   def self.up
-    create_table 'casserver_st', :force => true do |t|
+    create_table :casserver_sts do |t|
       t.string    'ticket',            :null => false
       t.text      'service',           :null => false
       t.timestamp 'created_on',        :null => false
@@ -14,6 +17,6 @@ class CasserverSt < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table 'casserver_st'
+    drop_table :casserver_sts
   end
 end
