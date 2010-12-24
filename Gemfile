@@ -29,3 +29,6 @@ gem 'unicorn'
 # group :development, :test do
 #   gem 'webrat'
 # end
+
+gem "crypt-isaac", "~> 0.9.1"
+gem "gettext", "~> 2.1.0"
