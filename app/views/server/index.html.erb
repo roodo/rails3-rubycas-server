@@ -13,6 +13,8 @@
       <%= label_tag "remember-me", "Remeber me for 14 days", {:id => "remember-me"} %>
     </div>
     <div id="signup-submit">
+      <input type="hidden" id="lt" name="lt" value="<%= @lt %>" />
+      <input type="hidden" id="service" name="service" value="<%= @service %>" />
       <%= submit_tag "Login" %>
     </div>
   <% end %>
