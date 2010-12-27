@@ -5,6 +5,7 @@ require "cas"
 
 
 class ServerController < ApplicationController
+  include CASServer::CAS
   
   def index
     CASServer::Utils::log_controller_action(self.class, params)
@@ -13,9 +14,9 @@ class ServerController < ApplicationController
     headers['Pragma'] = 'no-cache'
     headers['Cache-Control'] = 'no-store'
     headers['Expires'] = (Time.now - 1.year).rfc2822
-
+    
     # optional params
-    @service = CASServer::Cas::clean_service_url(params['service'])
+    @service = clean_service_url(params['service'])
     @renew = params['renew']
     @gateway = params['gateway'] == 'true' || params['gateway'] == '1'
 
