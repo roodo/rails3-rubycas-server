@@ -25,6 +25,34 @@ module CASServer::CAS
     return lt
   end
   
+  def validate_login_ticket(ticket)
+    $LOG.debug("Validating login ticket '#{ticket}'")
+
+    success = false
+    if ticket.nil?
+      error = _("Your login request did not include a login ticket. There may be a problem with the authentication system.")
+      $LOG.warn "Missing login ticket."
+    elsif lt = LoginTicket.find_by_ticket(ticket)
+      if lt.consumed?
+        error = _("The login ticket you provided has already been used up. Please try logging in again.")
+        $LOG.warn "Login ticket '#{ticket}' previously used up"
+      #elsif Time.now - lt.created_on < settings.config[:maximum_unused_login_ticket_lifetime]
+      elsif Time.now - lt.created_on < 300
+        $LOG.info "Login ticket '#{ticket}' successfully validated"
+      else
+        error = _("You took too long to enter your credentials. Please try again.")
+        $LOG.warn "Expired login ticket '#{ticket}'"
+      end
+    else
+      error = _("The login ticket you provided is invalid. There may be a problem with the authentication system.")
+      $LOG.warn "Invalid login ticket '#{ticket}'"
+    end
+
+    lt.consume! if lt
+
+    error
+  end
+  
   def clean_service_url(dirty_service)
     return dirty_service if dirty_service.blank?
     clean_service = dirty_service.dup

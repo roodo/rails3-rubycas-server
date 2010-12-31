@@ -70,10 +70,50 @@ class ServerController < ApplicationController
 
     @lt = lt.ticket
 
-    $LOG.debug(env)
+    #$LOG.debug(env)
   end
 
   def login
+    CASServer::Utils::log_controller_action(self.class, params)
+      
+    # 2.2.1 (optional)
+    @service = clean_service_url(params['service'])
+
+    # 2.2.2 (required)
+    @username = params['email']
+    @password = params['password']
+    @lt = params['lt']
+    
+    $LOG.debug("username: #{@username}")
+    $LOG.debug("password: #{@password}")
+    $LOG.debug("lt: #{@lt}")
+    
+    # Remove leading and trailing widespace from username.
+    @username.strip! if @username
+    
+    #if @username && settings.config[:downcase_username]
+    if @username
+      $LOG.debug("Converting username #{@username.inspect} to lowercase because 'downcase_username' option is enabled.")
+      @username.downcase!
+    end
+
+    if error = validate_login_ticket(@lt)
+      @message = {:type => 'mistake', :message => error}
+      # generate another login ticket to allow for re-submitting the form
+      @lt = generate_login_ticket.ticket
+      @status = 401
+      $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, message: #{@message}, status: #{@status}")
+      render :erb, :index
+    end
+    
+    # generate another login ticket to allow for re-submitting the form after a post
+    @lt = generate_login_ticket.ticket
+    #$LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}, auth: #{settings.auth.inspect}")
+    $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}")
+
+    credentials_are_valid = false
+    extra_attributes = {}
+    successful_authenticator = nil
   end
 
   def logout
