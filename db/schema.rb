@@ -10,18 +10,48 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101224091835) do
+ActiveRecord::Schema.define(:version => 20101231045126) do
 
-# Could not dump table "casserver_lts" because of following ArgumentError
-#   invalid date
+  create_table "casserver_lts", :force => true do |t|
+    t.string   "ticket",          :null => false
+    t.datetime "created_on",      :null => false
+    t.datetime "consumed"
+    t.string   "client_hostname", :null => false
+  end
 
-# Could not dump table "casserver_pgts" because of following ArgumentError
-#   invalid date
+  create_table "casserver_pgts", :force => true do |t|
+    t.string   "ticket",            :null => false
+    t.datetime "created_on",        :null => false
+    t.string   "client_hostname",   :null => false
+    t.string   "iou",               :null => false
+    t.integer  "service_ticket_id", :null => false
+  end
 
-# Could not dump table "casserver_sts" because of following ArgumentError
-#   invalid date
+  create_table "casserver_sts", :force => true do |t|
+    t.string   "ticket",            :null => false
+    t.text     "service",           :null => false
+    t.datetime "created_on",        :null => false
+    t.datetime "consumed"
+    t.string   "client_hostname",   :null => false
+    t.string   "username",          :null => false
+    t.string   "type",              :null => false
+    t.integer  "granted_by_pgt_id"
+    t.integer  "granted_by_tgt_id"
+  end
 
-# Could not dump table "casserver_tgts" because of following ArgumentError
-#   invalid date
+  create_table "casserver_tgts", :force => true do |t|
+    t.string   "ticket",           :null => false
+    t.datetime "created_on",       :null => false
+    t.string   "client_hostname",  :null => false
+    t.string   "username",         :null => false
+    t.text     "extra_attributes"
+  end
+
+  create_table "users", :force => true do |t|
+    t.string   "username",   :null => false
+    t.string   "password",   :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
 end
