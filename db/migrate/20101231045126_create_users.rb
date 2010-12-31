@@ -1,5 +1,7 @@
 #encoding: utf-8
 
+require 'digest/sha1'
+
 
 
 class CreateUsers < ActiveRecord::Migration
@@ -10,6 +12,9 @@ class CreateUsers < ActiveRecord::Migration
       t.timestamps 'created_at', :null => false
       t.timestamps 'updated_at', :null => false
     end
+    
+    user = Users.create(:username => 'wuhsien@roodo.com', :password => Digest::SHA1.hexdigest('1qaz2wsx'))
+    user.save
   end
 
   def self.down
