@@ -2,10 +2,44 @@
 
 require "utils"
 require "cas"
+require "authenticators/base"
+require "authenticators/sql"
 
 
 class ServerController < ApplicationController
   include CASServer::CAS
+  CONFIG_FILE = "config/cas.yml"
+  
+  def self.load_config_file(config_file)
+    begin
+      config_file = File.open(config_file)
+    rescue Errno::ENOENT => e
+      $stderr.puts
+      $stderr.puts "!!! Config file #{config_file.inspect} does not exist!"
+      $stderr.puts
+      raise e
+    rescue Errno::EACCES => e
+      $stderr.puts
+      $stderr.puts "!!! Config file #{config_file.inspect} is not readable (permission denied)!"
+      $stderr.puts
+      raise e
+    rescue => e
+      $stderr.puts
+      $stderr.puts "!!! Config file #{config_file.inspect} could not be read!"
+      $stderr.puts
+      raise e
+    end
+    
+    config.merge! HashWithIndifferentAccess.new(YAML.load(config_file))
+    #set :server, config[:server] || 'webrick'
+  end
+  
+  configure do
+    load_config_file(CONFIG_FILE)
+    #init_logger!
+    #init_database!
+    #init_authenticators!
+  end
   
   def index
     CASServer::Utils::log_controller_action(self.class, params)
@@ -103,17 +137,104 @@ class ServerController < ApplicationController
       @lt = generate_login_ticket.ticket
       @status = 401
       $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, message: #{@message}, status: #{@status}")
-      render :erb, :index
+      #render :erb, :index
+      return render :index
     end
     
     # generate another login ticket to allow for re-submitting the form after a post
     @lt = generate_login_ticket.ticket
     #$LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}, auth: #{settings.auth.inspect}")
     $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}")
-
+    
     credentials_are_valid = false
-    extra_attributes = {}
+    # extra_attributes = {}
     successful_authenticator = nil
+    begin
+      # auth_index = 0
+      # settings.auth.each do |auth_class|
+      #   auth = auth_class.new
+      # 
+      #   auth_config = settings.config[:authenticator][auth_index]
+      #   # pass the authenticator index to the configuration hash in case the authenticator needs to know
+      #   # it splace in the authenticator queue
+      #   auth.configure(auth_config.merge('auth_index' => auth_index))
+      # 
+      #   credentials_are_valid = auth.validate(
+      #     :username => @username,
+      #     :password => @password,
+      #     :service => @service,
+      #     :request => @env
+      #   )
+      #   if credentials_are_valid
+      #     extra_attributes.merge!(auth.extra_attributes) unless auth.extra_attributes.blank?
+      #     successful_authenticator = auth
+      #     break
+      #   end
+      # 
+      #   auth_index += 1
+      # end
+      
+      # auth = CASServer::Authenticators::SQL.new
+      # auth_config = settings.config[:authenticator][auth_index]
+      # auth.configure(auth_config.merge('auth_index' => auth_index))
+      
+      results = Users.find(:all, :conditions => ["account = ? AND password = ?", @username, @password])
+      if results.size > 0
+        credentials_are_valid = true
+      else
+        credentials_are_valid = false
+      end
+    rescue CASServer::AuthenticatorError => e
+      $LOG.error(e)
+      @message = {:type => 'mistake', :message => e.to_s}
+      return render(:index)
+    end
+    
+    if credentials_are_valid
+      extra_attributes = {}
+      tgt = generate_ticket_granting_ticket(@username, extra_attributes)
+      
+      #expires = settings.config[:maximum_session_lifetime].to_i.from_now
+      expires = 172800.to_i.from_now
+      expiry_info = " It will expire on #{expires}."
+
+      response.set_cookie('tgt', {
+        :value => tgt.to_s,
+        :expires => expires
+      })
+      
+      $LOG.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
+      
+      if @service.blank?
+        $LOG.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will not redirect.")
+        # @message = {:type => 'confirmation', :message => _("You have successfully logged in.")}
+        @message = {:type => 'confirmation', :message => "You have successfully logged in."}
+      else
+        @st = generate_service_ticket(@service, @username, tgt)
+        begin
+          service_with_ticket = service_uri_with_ticket(@service, @st)
+          $LOG.info("Redirecting authenticated user '#{@username}' at '#{@st.client_hostname}' to service '#{@service}'")
+          redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
+        rescue URI::InvalidURIError
+          $LOG.error("The service '#{@service}' is not a valid URI!")
+          @message = {
+            :type => 'mistake',
+            #:message => _("The target service your browser supplied appears to be invalid. Please contact your system administrator for help.")
+            :message => "The target service your browser supplied appears to be invalid. Please contact your system administrator for help."
+          }
+        end
+      end
+    else
+      $LOG.warn("Invalid credentials given for user '#{@username}'")
+      #@message = {:type => 'mistake', :message => _("Incorrect username or password.")}
+      @message = {:type => 'mistake', :message => "Incorrect username or password."}
+      @status = 401
+      #render :file => "public/401.html", :status => 401
+    end
+    
+    #render :erb, :index
+    $LOG.info("message: '#{@message}'")
+    render :index
   end
 
   def logout
