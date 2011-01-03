@@ -50,6 +50,6 @@ class CreateInitialStructure < ActiveRecord::Migration
     drop_table 'casserver_tgt'
     drop_table 'casserver_st'
     drop_table 'casserver_lt'
-    drop_table 'user''
+    drop_table 'user'
   end # self.down
 end
