@@ -14,14 +14,15 @@ module CASServer::CAS
     lt = LoginTicket.new
     lt.ticket = "LT-" + CASServer::Utils.random_string
     
-    $LOG.debug "lt.ticket: #{lt.ticket}"
-    $LOG.debug "request.env['REMOTE_ADDR']: #{request.env['REMOTE_ADDR']}"
-    $LOG.debug "request.env['REMOTE_HOST']: #{request.env['REMOTE_HOST']}"
-    $LOG.debug "request.env['HTTP_X_FORWARDED_FOR']: #{request.env['HTTP_X_FORWARDED_FOR']}"
+    # $LOG.debug "lt.ticket: #{lt.ticket}"
+    # $LOG.debug "request.env['REMOTE_ADDR']: #{request.env['REMOTE_ADDR']}"
+    # $LOG.debug "request.env['REMOTE_HOST']: #{request.env['REMOTE_HOST']}"
+    # $LOG.debug "request.env['HTTP_X_FORWARDED_FOR']: #{request.env['HTTP_X_FORWARDED_FOR']}"
     
     lt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
     lt.save!
-    $LOG.debug("Generated login ticket '#{lt.ticket}' for client" + " at '#{lt.client_hostname}'")
+    # $LOG.debug("Generated login ticket '#{lt.ticket}' for client" + " at '#{lt.client_hostname}'")
+    Rails.logger.debug("Generated login ticket '#{lt.ticket}' for client" + " at '#{lt.client_hostname}'")
     return lt
   end
   
@@ -33,7 +34,10 @@ module CASServer::CAS
     tgt.extra_attributes = extra_attributes
     tgt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
     tgt.save!
-    $LOG.debug("Generated ticket granting ticket '#{tgt.ticket}' for user" +
+    # $LOG.debug("Generated ticket granting ticket '#{tgt.ticket}' for user" +
+    #   " '#{tgt.username}' at '#{tgt.client_hostname}'" +
+    #   (extra_attributes.blank? ? "" : " with extra attributes #{extra_attributes.inspect}"))
+    Rails.logger.debug("Generated ticket granting ticket '#{tgt.ticket}' for user" +
       " '#{tgt.username}' at '#{tgt.client_hostname}'" +
       (extra_attributes.blank? ? "" : " with extra attributes #{extra_attributes.inspect}"))
     tgt
@@ -48,36 +52,44 @@ module CASServer::CAS
     st.granted_by_tgt_id = tgt.id
     st.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
     st.save!
-    $LOG.debug("Generated service ticket '#{st.ticket}' for service '#{st.service}'" +
+    # $LOG.debug("Generated service ticket '#{st.ticket}' for service '#{st.service}'" +
+    #   " for user '#{st.username}' at '#{st.client_hostname}'")
+    Rails.logger.info("Generated service ticket '#{st.ticket}' for service '#{st.service}'" +
       " for user '#{st.username}' at '#{st.client_hostname}'")
     st
   end
   
   def validate_login_ticket(ticket)
-    $LOG.debug("Validating login ticket '#{ticket}'")
+    # $LOG.debug("Validating login ticket '#{ticket}'")
+    Rails.logger.info("Validating login ticket '#{ticket}'")
 
     success = false
     if ticket.nil?
       #error = _("Your login request did not include a login ticket. There may be a problem with the authentication system.")
       error = "Your login request did not include a login ticket. There may be a problem with the authentication system."
-      $LOG.warn "Missing login ticket."
+      # $LOG.warn "Missing login ticket."
+      Rails.logger.warn "Missing login ticket."
     elsif lt = LoginTicket.find_by_ticket(ticket)
       if lt.consumed?
         #error = _("The login ticket you provided has already been used up. Please try logging in again.")
         error = "The login ticket you provided has already been used up. Please try logging in again."
-        $LOG.warn "Login ticket '#{ticket}' previously used up"
+        # $LOG.warn "Login ticket '#{ticket}' previously used up"
+        Rails.logger.warn "Login ticket '#{ticket}' previously used up"
       #elsif Time.now - lt.created_on < settings.config[:maximum_unused_login_ticket_lifetime]
       elsif Time.now - lt.created_on < 300
-        $LOG.info "Login ticket '#{ticket}' successfully validated"
+        # $LOG.info "Login ticket '#{ticket}' successfully validated"
+        Rails.logger.info "Login ticket '#{ticket}' successfully validated"
       else
         #error = _("You took too long to enter your credentials. Please try again.")
         error = "You took too long to enter your credentials. Please try again."
-        $LOG.warn "Expired login ticket '#{ticket}'"
+        # $LOG.warn "Expired login ticket '#{ticket}'"
+        Rails.logger.warn "Expired login ticket '#{ticket}'"
       end
     else
       #error = _("The login ticket you provided is invalid. There may be a problem with the authentication system.")
       error = "The login ticket you provided is invalid. There may be a problem with the authentication system."
-      $LOG.warn "Invalid login ticket '#{ticket}'"
+      # $LOG.warn "Invalid login ticket '#{ticket}'"
+      Rails.logger.warn "Invalid login ticket '#{ticket}'"
     end
 
     lt.consume! if lt
@@ -117,7 +129,8 @@ module CASServer::CAS
     clean_service.gsub!('?&', '?')
     clean_service.gsub!(' ', '+')
 
-    $LOG.debug("Cleaned dirty service URL #{dirty_service.inspect} to #{clean_service.inspect}") if dirty_service != clean_service
+    # $LOG.debug("Cleaned dirty service URL #{dirty_service.inspect} to #{clean_service.inspect}") if dirty_service != clean_service
+    Rails.logger.debug("Cleaned dirty service URL #{dirty_service.inspect} to #{clean_service.inspect}") if dirty_service != clean_service
     return clean_service
   end
   module_function :clean_service_url

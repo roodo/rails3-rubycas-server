@@ -77,21 +77,21 @@ class ServerController < ApplicationController
         if !@renew && tgt && !tgt_error
           st = generate_service_ticket(@service, tgt.username, tgt)
           service_with_ticket = service_uri_with_ticket(@service, st)
-          $LOG.info("User '#{tgt.username}' authenticated based on ticket granting cookie. Redirecting to service '#{@service}'.")
+          Rails.logger.debug("User '#{tgt.username}' authenticated based on ticket granting cookie. Redirecting to service '#{@service}'.")
           redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
         elsif @gateway
-          $LOG.info("Redirecting unauthenticated gateway request to service '#{@service}'.")
+          Rails.logger.debug("Redirecting unauthenticated gateway request to service '#{@service}'.")
           redirect @service, 303
         end
       elsif @gateway
-          $LOG.error("This is a gateway request but no service parameter was given!")
+          Rails.logger.debug("This is a gateway request but no service parameter was given!")
           @message = {
             :type => 'mistake',
             :message => _("The server cannot fulfill this gateway request because no service parameter was given.")
           }
       end
     rescue URI::InvalidURIError
-      $LOG.error("The service '#{@service}' is not a valid URI!")
+      Rails.logger.debug("The service '#{@service}' is not a valid URI!")
       @message = {
         :type => 'mistake',
         :message => _("The target service your browser supplied appears to be invalid. Please contact your system administrator for help.")
@@ -100,7 +100,7 @@ class ServerController < ApplicationController
 
     lt = generate_login_ticket
 
-    $LOG.debug("Rendering login form with lt: #{lt}, service: #{@service}, renew: #{@renew}, gateway: #{@gateway}")
+    Rails.logger.debug("Rendering login form with lt: #{lt}, service: #{@service}, renew: #{@renew}, gateway: #{@gateway}")
 
     @lt = lt.ticket
 
@@ -117,17 +117,13 @@ class ServerController < ApplicationController
     @username = params['email']
     @password = params['password']
     @lt = params['lt']
-    
-    $LOG.debug("username: #{@username}")
-    $LOG.debug("password: #{@password}")
-    $LOG.debug("lt: #{@lt}")
-    
+
     # Remove leading and trailing widespace from username.
     @username.strip! if @username
     
     #if @username && settings.config[:downcase_username]
     if @username
-      $LOG.debug("Converting username #{@username.inspect} to lowercase because 'downcase_username' option is enabled.")
+      Rails.logger.debug("Converting username #{@username.inspect} to lowercase because 'downcase_username' option is enabled.")
       @username.downcase!
     end
 
@@ -136,7 +132,7 @@ class ServerController < ApplicationController
       # generate another login ticket to allow for re-submitting the form
       @lt = generate_login_ticket.ticket
       @status = 401
-      $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, message: #{@message}, status: #{@status}")
+      Rails.logger.debug("Logging in with username: #{@username}, lt: #{@lt}, message: #{@message}, status: #{@status}")
       #render :erb, :index
       return render :index
     end
@@ -144,7 +140,7 @@ class ServerController < ApplicationController
     # generate another login ticket to allow for re-submitting the form after a post
     @lt = generate_login_ticket.ticket
     #$LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}, auth: #{settings.auth.inspect}")
-    $LOG.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}")
+    Rails.logger.debug("Logging in with username: #{@username}, lt: #{@lt}, service: #{@service}")
     
     credentials_are_valid = false
     # extra_attributes = {}
@@ -203,17 +199,17 @@ class ServerController < ApplicationController
         :expires => expires
       })
       
-      $LOG.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
+      Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
       
       if @service.blank?
-        $LOG.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will not redirect.")
+        Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will not redirect.")
         # @message = {:type => 'confirmation', :message => _("You have successfully logged in.")}
         @message = {:type => 'confirmation', :message => "You have successfully logged in."}
       else
         @st = generate_service_ticket(@service, @username, tgt)
         begin
           service_with_ticket = service_uri_with_ticket(@service, @st)
-          $LOG.info("Redirecting authenticated user '#{@username}' at '#{@st.client_hostname}' to service '#{@service}'")
+          Rails.logger.info("Redirecting authenticated user '#{@username}' at '#{@st.client_hostname}' to service '#{@service}'")
           redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
         rescue URI::InvalidURIError
           $LOG.error("The service '#{@service}' is not a valid URI!")
@@ -225,7 +221,7 @@ class ServerController < ApplicationController
         end
       end
     else
-      $LOG.warn("Invalid credentials given for user '#{@username}'")
+      Rails.logger.warn("Invalid credentials given for user '#{@username}'")
       #@message = {:type => 'mistake', :message => _("Incorrect username or password.")}
       @message = {:type => 'mistake', :message => "Incorrect username or password."}
       @status = 401
@@ -233,7 +229,7 @@ class ServerController < ApplicationController
     end
     
     #render :erb, :index
-    $LOG.info("message: '#{@message}'")
+    Rails.logger.info("message: '#{@message}'")
     render :index
   end
 

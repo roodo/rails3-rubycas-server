@@ -59,12 +59,12 @@ module CASServer::Model
   end
 
   class LoginTicket < Ticket
-    set_table_name 'casserver_lts'
+    set_table_name 'casserver_lt'
     include Consumable
   end
 
   class ServiceTicket < Ticket
-    set_table_name 'casserver_sts'
+    set_table_name 'casserver_st'
     include Consumable
 
     belongs_to :granted_by_tgt,
@@ -86,7 +86,7 @@ module CASServer::Model
   end
 
   class TicketGrantingTicket < Ticket
-    set_table_name 'casserver_tgts'
+    set_table_name 'casserver_tgt'
 
     serialize :extra_attributes
 
@@ -96,7 +96,7 @@ module CASServer::Model
   end
 
   class ProxyGrantingTicket < Ticket
-    set_table_name 'casserver_pgts'
+    set_table_name 'casserver_pgt'
     belongs_to :service_ticket
     has_many :granted_proxy_tickets,
       :class_name => 'CASServer::Model::ProxyTicket',

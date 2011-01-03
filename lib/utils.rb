@@ -16,8 +16,9 @@ module CASServer
     module_function :random_string
     
     def log_controller_action(controller, params)
-      $LOG << "\n"
-
+      #$LOG << "\n"
+      #Rails.logger << "\n"
+      
       /`(.*)'/.match(caller[1])
       method = $~[1]
 
@@ -27,7 +28,10 @@ module CASServer
       else
         params2 = params
       end
-      $LOG.debug("Processing #{controller}::#{method} #{params2.inspect}")
+      #$LOG.debug("Processing #{controller}::#{method} #{params2.inspect}")
+      # logger.debug("Processing #{controller}::#{method} #{params2.inspect}")
+      Rails.logger.debug "Processing #{controller}::#{method} #{params2.inspect}"
+      # Rails.logger("Processing #{controller}::#{method} #{params2.inspect}")
     end
     module_function :log_controller_action
   end
