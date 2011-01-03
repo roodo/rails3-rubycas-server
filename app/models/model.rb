@@ -36,7 +36,10 @@ module CASServer::Model
 
   class Base < ActiveRecord::Base
   end
-
+  
+  class User < ActiveRecord::Base
+  end
+  
   class Ticket < Base
     def to_s
       ticket
