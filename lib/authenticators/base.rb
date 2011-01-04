@@ -1,7 +1,3 @@
-#encoding: utf-8
-
-
-
 module CASServer
   module Authenticators
     class Base
@@ -56,11 +52,11 @@ module CASServer
         elsif @options[:extra_attributes].kind_of? String
           attrs = @options[:extra_attributes].split(',').collect{|col| col.strip}
         else
-          $LOG.error("Can't figure out attribute list from #{@options[:extra_attributes].inspect}. This must be an Aarray of column names or a comma-separated list.")
+          Rails.logger.debug("Can't figure out attribute list from #{@options[:extra_attributes].inspect}. This must be an Aarray of column names or a comma-separated list.")
           attrs = []
         end
 
-        $LOG.debug("#{self.class.name} will try to extract the following extra_attributes: #{attrs.inspect}")
+        Rails.logger.debug("#{self.class.name} will try to extract the following extra_attributes: #{attrs.inspect}")
         return attrs
       end
     end

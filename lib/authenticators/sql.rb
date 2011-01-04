@@ -1,6 +1,3 @@
-#encoding: utf-8
-
-
 require 'authenticators/base'
 
 # begin
@@ -61,7 +58,7 @@ class CASServer::Authenticators::SQL < CASServer::Authenticators::Base
     raise CASServer::AuthenticatorError, "Invalid authenticator configuration!" unless options[:database]
 
     user_model_name = "CASUser_#{options[:auth_index]}"
-    $LOG.debug "CREATING USER MODEL #{user_model_name}"
+    Rails.logger.debug "CREATING USER MODEL #{user_model_name}"
 
     class_eval %{
       class #{user_model_name} < ActiveRecord::Base
@@ -87,16 +84,16 @@ class CASServer::Authenticators::SQL < CASServer::Authenticators::Base
     username_column = @options[:username_column] || 'username'
     password_column = @options[:password_column] || 'password'
     
-    $LOG.debug "#{self.class}: [#{user_model}] " + "Connection pool size: #{user_model.connection_pool.instance_variable_get(:@checked_out).length}/#{user_model.connection_pool.instance_variable_get(:@connections).length}"
+    Rails.logger.debug "#{self.class}: [#{user_model}] " + "Connection pool size: #{user_model.connection_pool.instance_variable_get(:@checked_out).length}/#{user_model.connection_pool.instance_variable_get(:@connections).length}"
     results = user_model.find(:all, :conditions => ["#{username_column} = ? AND #{password_column} = ?", @username, @password])
     user_model.connection_pool.checkin(user_model.connection)
        
     if results.size > 0
-      $LOG.warn("#{self.class}: Multiple matches found for user #{@username.inspect}") if results.size > 1
+      Rails.logger.warn("#{self.class}: Multiple matches found for user #{@username.inspect}") if results.size > 1
       
       unless @options[:extra_attributes].blank?
         if results.size > 1
-          $LOG.warn("#{self.class}: Unable to extract extra_attributes because multiple matches were found for #{@username.inspect}")
+          Rails.logger.warn("#{self.class}: Unable to extract extra_attributes because multiple matches were found for #{@username.inspect}")
         else
           user = results.first
 
@@ -128,9 +125,9 @@ class CASServer::Authenticators::SQL < CASServer::Authenticators::Base
 
   def log_extra
     if @extra_attributes.empty?
-      $LOG.warn("#{self.class}: Did not read any extra_attributes for user #{@username.inspect} even though an :extra_attributes option was provided.")
+      Rails.logger.warn("#{self.class}: Did not read any extra_attributes for user #{@username.inspect} even though an :extra_attributes option was provided.")
     else
-      $LOG.debug("#{self.class}: Read the following extra_attributes for user #{@username.inspect}: #{@extra_attributes.inspect}")
+      Rails.logger.debug("#{self.class}: Read the following extra_attributes for user #{@username.inspect}: #{@extra_attributes.inspect}")
     end
   end
 end
