@@ -14,7 +14,7 @@ class ServerController < ApplicationController
   @@app_file = __FILE__ 
   @@public = File.expand_path(File.dirname(__FILE__)+"/../../public")
   
-  config = HashWithIndifferentAccess.new(
+  @@config = HashWithIndifferentAccess.new(
     :maximum_unused_login_ticket_lifetime => 5.minutes,
     :maximum_unused_service_ticket_lifetime => 5.minutes, # CAS Protocol Spec, sec. 3.2.1 (recommended expiry time)
     :maximum_session_lifetime => 1.month,                 # all tickets are deleted after this period of time
@@ -23,7 +23,7 @@ class ServerController < ApplicationController
         :level => 'DEBUG'},
     :uri_path => ""
   )
-  @@config = config
+  #@@config = config
   
   def self.uri_path
     @@config[:uri_path]
