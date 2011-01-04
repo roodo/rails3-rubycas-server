@@ -354,6 +354,7 @@ class ServerController < ApplicationController
   end
   
   def demo
+    render :text => session
   end
   
   def validate
