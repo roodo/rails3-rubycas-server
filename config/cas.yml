@@ -28,8 +28,8 @@
 # high-performance scenarios you may want to look into deploying using Mongrel
 # or Passenger.
 
-server: webrick
-port: 3000
+#server: webrick
+#port: 3000
 #ssl_cert: /path/to/your/ssl.pem
 
 # If your private key is in a separate file from the cert
@@ -171,11 +171,11 @@ port: 3000
 #   i.e. `mysqladmin -u root create casserver`)
 
 database:
-  adapter: mysql
+  adapter: mysql2
   database: roodo_cas_development
   username: root
-  password: uTAbin247
-  host: 192.168.0.87
+  password: '@!wqsaxz'
+  host: 127.0.0.1
 
 # IMPORTANT! By default, the server can handle up to ~5 concurrent requests
 # (without queuing). You can increase this by setting the database connection
@@ -244,13 +244,13 @@ database:
 authenticator:
   class: CASServer::Authenticators::SQL
   database:
-    adapter: mysql
-    database: some_database_with_users_table
+    adapter: mysql2
+    database: roodo_cas_development
     username: root
-    password: uTAbin247
-    host: 192.168.0.87
+    password: '@!wqsaxz'
+    host: 127.0.0.1
   user_table: users
-  username_column: account
+  username_column: username
   password_column: password
 #
 # When replying to a CAS client's validation request, the server will normally
@@ -476,14 +476,14 @@ authenticator:
 # like logo.png and bg.png.
 #
 # By default, we use the 'simple' theme which you can find in themes/simple.
-theme: simple
+#theme: simple
 
 # The name of your company/organization. This will show up on the login page.
-organization: CAS
+#organization: CAS
 
 # A short bit of text that shows up on the login page. You can make this blank 
 # if you prefer to have no extra text shown at the bottom of the login box.
-infoline: Powered by <a href="http://code.google.com/p/rubycas-server/">RubyCAS-Server</a>
+#infoline: Powered by <a href="http://code.google.com/p/rubycas-server/">RubyCAS-Server</a>
 
 # Custom views file.  Overrides methodes in lib/casserver/views.rb
 #custom_views_file: /path/to/custom/views.rb
@@ -531,8 +531,8 @@ log:
 # Every SQL query will be logged here. This is useful for debugging database 
 # problems.
 #
-#db_log:
-#  file: /var/log/casserver_db.log
+db_log:
+  file: /var/log/casserver_db.log
 
 
 ##### SINGLE SIGN-OUT ##########################################################
@@ -562,8 +562,8 @@ log:
 # Unused login and service tickets become unusable this many seconds after
 # they are created. (Defaults to 5 minutes)
 
-#maximum_unused_login_ticket_lifetime: 300
-#maximum_unused_service_ticket_lifetime: 300
+maximum_unused_login_ticket_lifetime: 300
+maximum_unused_service_ticket_lifetime: 300
 
 # The server must periodically delete old tickets (login tickets, service tickets
 # proxy-granting tickets, and ticket-granting tickets) to prevent buildup of
@@ -573,7 +573,7 @@ log:
 # Note that this limit is not enforced on the client side; it refers only to the
 # the maximum lifetime of tickets on the CAS server.
 
-#maximum_session_lifetime: 172800
+maximum_session_lifetime: 172800
 
 
 # If you want the usernames entered on the login page to be automatically 
@@ -582,4 +582,4 @@ log:
 # system will automatically
 # convert this to "jsmith".
 
-#downcase_username: true
+downcase_username: true
