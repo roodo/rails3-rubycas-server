@@ -59,6 +59,7 @@ RoodoCasServer::Application.routes.draw do
   get  "server/serviceValidate"
   get  "server/proxyValidate"
   get  "server/proxy"
+  get  "server/demo"
   
   # See how all your routes lay out with "rake routes"
 
