@@ -2,8 +2,8 @@
 
 require "utils"
 require "cas"
-require "authenticators/base"
-require "authenticators/sql"
+# require "authenticators/base"
+# require "authenticators/sql"
 
 
 class ServerController < ApplicationController
@@ -103,7 +103,9 @@ class ServerController < ApplicationController
     begin
       # attempt to instantiate the authenticator
       @config[:authenticator] = [@config[:authenticator]] unless @config[:authenticator].instance_of? Array
-      @config[:authenticator].each { |authenticator| auth << authenticator[:class].constantize}
+      @config[:authenticator].each { |authenticator|
+        auth << authenticator[:class].constantize
+      }
     rescue NameError
       if @config[:authenticator].instance_of? Array
         @config[:authenticator].each do |authenticator|
@@ -113,7 +115,7 @@ class ServerController < ApplicationController
           else
             # the authenticator class hasn't yet been loaded, so lets try to load it from the casserver/authenticators directory
             auth_rb = authenticator[:class].underscore.gsub('cas_server/', '')
-            require 'casserver/' + auth_rb
+            require auth_rb
           end
           auth << authenticator[:class].constantize
         end
@@ -124,7 +126,7 @@ class ServerController < ApplicationController
         else
           # the authenticator class hasn't yet been loaded, so lets try to load it from the casserver/authenticators directory
           auth_rb = @config[:authenticator][:class].underscore.gsub('cas_server/', '')
-          require 'casserver/' + auth_rb
+          require auth_rb
         end
 
         auth << @config[:authenticator][:class].constantize
@@ -156,7 +158,7 @@ class ServerController < ApplicationController
   configure do
     load_config_file(CONFIG_FILE)
     init_logger!
-    # init_authenticators!
+    init_authenticators!
   end
   
   def index
