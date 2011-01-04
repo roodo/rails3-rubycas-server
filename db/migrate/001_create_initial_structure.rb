@@ -1,13 +1,19 @@
+#encoding: utf-8
+
+require 'digest'
+
+
+
 class CreateInitialStructure < ActiveRecord::Migration
   def self.up
-    create_table 'casserver_lt', :force => true do |t|
+    create_table 'casserver_lts', :force => true do |t|
       t.string    'ticket',          :null => false
       t.timestamp 'created_on',      :null => false
       t.datetime  'consumed',        :null => true
       t.string    'client_hostname', :null => false
     end
 
-    create_table 'casserver_st', :force => true do |t|
+    create_table 'casserver_sts', :force => true do |t|
       t.string    'ticket',            :null => false
       t.text      'service',           :null => false
       t.timestamp 'created_on',        :null => false
@@ -19,7 +25,7 @@ class CreateInitialStructure < ActiveRecord::Migration
       t.integer   'granted_by_tgt_id', :null => true
     end
 
-    create_table 'casserver_tgt', :force => true do |t|
+    create_table 'casserver_tgts', :force => true do |t|
       t.string    'ticket',           :null => false
       t.timestamp 'created_on',       :null => false
       t.string    'client_hostname',  :null => false
@@ -27,7 +33,7 @@ class CreateInitialStructure < ActiveRecord::Migration
       t.text      'extra_attributes', :null => true
     end
 
-    create_table 'casserver_pgt', :force => true do |t|
+    create_table 'casserver_pgts', :force => true do |t|
       t.string    'ticket',            :null => false
       t.timestamp 'created_on',        :null => false
       t.string    'client_hostname',   :null => false
@@ -35,12 +41,14 @@ class CreateInitialStructure < ActiveRecord::Migration
       t.integer   'service_ticket_id', :null => false
     end
     
-    create_table 'user', :force => true do |t|
+    create_table 'users', :force => true do |t|
       t.string     'username',   :null => false
       t.string     'password',   :null => false
       t.timestamps 'created_at', :null => false
       t.timestamps 'updated_at', :null => false
     end
+    
+    #Users.create  :username => "notice", :password => Digest::SHA1.hexdigest("@!wqsaxz")
   end # self.up
 
   def self.down
