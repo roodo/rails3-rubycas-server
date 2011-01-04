@@ -238,7 +238,6 @@ class ServerController < ApplicationController
     @username.strip! if @username
     
     if @username && @@config[:downcase_username]
-      Rails.logger.debug @@config[:downcase_username]
       Rails.logger.debug("Converting username #{@username.inspect} to lowercase because 'downcase_username' option is enabled.")
       @username.downcase!
     end
@@ -247,9 +246,7 @@ class ServerController < ApplicationController
       @message = {:type => 'mistake', :message => error}
       # generate another login ticket to allow for re-submitting the form
       @lt = generate_login_ticket.ticket
-      @status = 401
-      
-      render :index
+      return render :index, :status => 401
     end
     
     # generate another login ticket to allow for re-submitting the form after a post
@@ -286,9 +283,10 @@ class ServerController < ApplicationController
     rescue CASServer::AuthenticatorError => e
       Rails.logger.debug(e)
       @message = {:type => 'mistake', :message => e.to_s}
-      return render(:index)
+      return render :index
     end
     
+    Rails.logger.debug credentials_are_valid
     if credentials_are_valid
       Rails.logger.info("Credentials for username '#{@username}' successfully validated using #{successful_authenticator.class.name}.")
       Rails.logger.debug("Authenticator provided additional user attributes: #{extra_attributes.inspect}") unless extra_attributes.blank?
@@ -333,7 +331,7 @@ class ServerController < ApplicationController
     else
       Rails.logger.warn("Invalid credentials given for user '#{@username}'")
       @message = {:type => 'mistake', :message => "Incorrect username or password."}
-      return render :status => 401
+      return render :index, :status => 401
     end
 
     render :index
