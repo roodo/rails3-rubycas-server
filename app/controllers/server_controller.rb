@@ -272,6 +272,7 @@ class ServerController < ApplicationController
           :service => @service,
           :request => @env
         )
+        
         if credentials_are_valid
           extra_attributes.merge!(auth.extra_attributes) unless auth.extra_attributes.blank?
           successful_authenticator = auth
@@ -311,7 +312,7 @@ class ServerController < ApplicationController
 
       if @service.blank?
         Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will not redirect.")
-        @message = {:type => 'confirmation', :message => _("You have successfully logged in.")}
+        @message = {:type => 'confirmation', :message => "You have successfully logged in."}
       else
         @st = generate_service_ticket(@service, @username, tgt)
 
@@ -338,6 +339,9 @@ class ServerController < ApplicationController
   end
 
   def logout
+  end
+  
+  def demo
   end
   
   def validate

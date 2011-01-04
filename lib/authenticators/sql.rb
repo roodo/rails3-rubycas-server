@@ -1,4 +1,9 @@
+#encoding: utf-8
+
 require 'authenticators/base'
+require 'digest'
+
+
 
 # begin
 #   require 'active_record'
@@ -85,7 +90,7 @@ class CASServer::Authenticators::SQL < CASServer::Authenticators::Base
     password_column = @options[:password_column] || 'password'
     
     Rails.logger.debug "#{self.class}: [#{user_model}] " + "Connection pool size: #{user_model.connection_pool.instance_variable_get(:@checked_out).length}/#{user_model.connection_pool.instance_variable_get(:@connections).length}"
-    results = user_model.find(:all, :conditions => ["#{username_column} = ? AND #{password_column} = ?", @username, @password])
+    results = user_model.find(:all, :conditions => ["#{username_column} = ? AND #{password_column} = ?", @username, Digest::SHA1.hexdigest(@password)])
     user_model.connection_pool.checkin(user_model.connection)
        
     if results.size > 0
