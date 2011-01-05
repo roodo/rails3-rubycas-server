@@ -241,17 +241,6 @@ database:
 #  user_table: users
 #  username_column: username
 #  password_column: password
-# authenticator:
-#   class: CASServer::Authenticators::SQL
-#   database:
-#     adapter: mysql2
-#     database: roodo_cas_development
-#     username: root
-#     password: '@!wqsaxz'
-#     host: 127.0.0.1
-#   user_table: users
-#   username_column: username
-#   password_column: password
 #
 # When replying to a CAS client's validation request, the server will normally
 # provide the client with the authenticated user's username. However it is
@@ -574,7 +563,6 @@ db_log:
 
 # Unused login and service tickets become unusable this many seconds after
 # they are created. (Defaults to 5 minutes)
-
 maximum_unused_login_ticket_lifetime: 300
 maximum_unused_service_ticket_lifetime: 300
 
@@ -585,9 +573,11 @@ maximum_unused_service_ticket_lifetime: 300
 # 
 # Note that this limit is not enforced on the client side; it refers only to the
 # the maximum lifetime of tickets on the CAS server.
-
 maximum_session_lifetime: 172800
 
+# This would provide an additional checkbox for user to
+# indicate if (s)he want to be remembered on the browser. (Defaults to 14 dayss)
+remember_me_session_lifetime: 1209600
 
 # If you want the usernames entered on the login page to be automatically 
 # downcased (converted to lowercase), enable the following option. When this 
