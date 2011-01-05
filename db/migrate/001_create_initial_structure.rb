@@ -1,7 +1,5 @@
 #encoding: utf-8
 
-require 'digest'
-
 
 
 class CreateInitialStructure < ActiveRecord::Migration
@@ -42,14 +40,14 @@ class CreateInitialStructure < ActiveRecord::Migration
     end
     
     create_table 'users', :force => true do |t|
-      t.string     'username',   :null => false
+      t.string     'email',      :null => false
       t.string     'password',   :null => false
+      t.string     'nickname',   :null => false
+      t.string     'birthday',   :null => false
       t.timestamps 'created_at', :null => false
       t.timestamps 'updated_at', :null => false
     end
-    
-    #Users.create  :username => "notice", :password => Digest::SHA1.hexdigest("@!wqsaxz")
-  end # self.up
+  end
 
   def self.down
     drop_table 'casserver_pgt'
@@ -57,5 +55,5 @@ class CreateInitialStructure < ActiveRecord::Migration
     drop_table 'casserver_st'
     drop_table 'casserver_lt'
     drop_table 'user'
-  end # self.down
+  end 
 end
