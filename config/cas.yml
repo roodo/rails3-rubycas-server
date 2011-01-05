@@ -241,17 +241,17 @@ database:
 #  user_table: users
 #  username_column: username
 #  password_column: password
-authenticator:
-  class: CASServer::Authenticators::SQL
-  database:
-    adapter: mysql2
-    database: roodo_cas_development
-    username: root
-    password: '@!wqsaxz'
-    host: 127.0.0.1
-  user_table: users
-  username_column: username
-  password_column: password
+# authenticator:
+#   class: CASServer::Authenticators::SQL
+#   database:
+#     adapter: mysql2
+#     database: roodo_cas_development
+#     username: root
+#     password: '@!wqsaxz'
+#     host: 127.0.0.1
+#   user_table: users
+#   username_column: username
+#   password_column: password
 #
 # When replying to a CAS client's validation request, the server will normally
 # provide the client with the authenticated user's username. However it is
@@ -275,6 +275,18 @@ authenticator:
 #  password_column: password
 #  extra_attributes: full_name, access_level
 #
+authenticator:
+  class: CASServer::Authenticators::SQL
+  database:
+    adapter: mysql2
+    database: roodo_cas_development
+    username: root
+    password: '@!wqsaxz'
+    host: 127.0.0.1
+  user_table: users
+  username_column: username
+  password_column: password
+  extra_attributes: username
 #
 #
 # === Google Authentication ====================================================
@@ -476,14 +488,15 @@ authenticator:
 # like logo.png and bg.png.
 #
 # By default, we use the 'simple' theme which you can find in themes/simple.
-#theme: simple
+theme: simple
 
 # The name of your company/organization. This will show up on the login page.
-#organization: CAS
+organization: JUT Living Development Co., Ltd
 
 # A short bit of text that shows up on the login page. You can make this blank 
 # if you prefer to have no extra text shown at the bottom of the login box.
 #infoline: Powered by <a href="http://code.google.com/p/rubycas-server/">RubyCAS-Server</a>
+infoline: Copyright © 2010, JUT Living Development Co., Ltd
 
 # Custom views file.  Overrides methodes in lib/casserver/views.rb
 #custom_views_file: /path/to/custom/views.rb

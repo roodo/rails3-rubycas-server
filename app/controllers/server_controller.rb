@@ -161,13 +161,23 @@ class ServerController < ApplicationController
     init_authenticators!
   end
   
+  before_filter :set_settings
+  
+  def set_settings
+    # make sure charset is UTF-8
+    response.headers['Content-Type'] = 'text/html; charset=UTF-8'
+    @theme = @@config[:theme] if @@config[:theme]
+    @organization = @@config[:organization] if @@config[:organization]
+    @infoline = @@config[:infoline] if @@config[:infoline]
+  end
+  
   def index
     CASServer::Utils::log_controller_action(self.class, params)
     
     # make sure there's no caching
-    headers['Pragma'] = 'no-cache'
-    headers['Cache-Control'] = 'no-store'
-    headers['Expires'] = (Time.now - 1.year).rfc2822
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Cache-Control'] = 'no-store'
+    response.headers['Expires'] = (Time.now - 1.year).rfc2822
     
     # optional params
     @service = clean_service_url(params['service'])
@@ -311,8 +321,9 @@ class ServerController < ApplicationController
       Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
 
       if @service.blank?
-        Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will not redirect.")
+        Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will redirect to demo page.")
         @message = {:type => 'confirmation', :message => "You have successfully logged in."}
+        return redirect_to :action => "demo"
       else
         @st = generate_service_ticket(@service, @username, tgt)
 
@@ -320,7 +331,8 @@ class ServerController < ApplicationController
           service_with_ticket = service_uri_with_ticket(@service, @st)
 
           Rails.logger.info("Redirecting authenticated user '#{@username}' at '#{@st.client_hostname}' to service '#{@service}'")
-          redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
+          #redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
+          return redirect_to service_with_ticket, :status => 303
         rescue URI::InvalidURIError
           Rails.logger.error("The service '#{@service}' is not a valid URI!")
           @message = {
@@ -335,7 +347,7 @@ class ServerController < ApplicationController
       return render :index, :status => 401
     end
 
-    render :index
+    return render :index
   end
 
   def logout
@@ -396,6 +408,7 @@ class ServerController < ApplicationController
   end
   
   def demo
+    render :text => session
   end
   
   def validate
