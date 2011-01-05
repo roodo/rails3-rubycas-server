@@ -18,6 +18,13 @@
       <%= submit_tag "Login" %>
     </div>
   <% end %>
+  <% if @message %>
+    <div id="clear"></div>
+    <div id="err-msg">
+      <!--<div id="err-msg-type"><%#= @message[:type] %></div>-->
+      <div id="err-msg-content"><%= @message[:message] %></div>
+    </div>
+  <% end %>
 </div>
 <div id="right-splash">
   A clone of the rubycas-server, providing a cross-domain single sign-on solution for web applications using Rails3.
@@ -28,10 +35,4 @@
   </ul>
 </div>
 
-<% if @message %>
-  <div id="clear"></div>
-  <div id="err-msg">
-    <div id="err-msg-type"><%= @message[:type] %></div>
-    <div id="err-msg-content"><%= @message[:message] %></div>
-  </div>
-<% end %>
+

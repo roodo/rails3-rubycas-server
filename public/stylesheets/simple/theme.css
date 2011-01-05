@@ -72,24 +72,24 @@ div#right-splash h2 {
   color: #333;
 }
 div#err-msg {
-  border: 1px solid #CCC;
-  margin: 0 auto;
+  border: 0px solid #CCC;
   margin-top: 40px;
-  width: 500px;
-  padding: 8px;
+  text-align: left;
+  margin-left: 85px;
 }
 div#err-msg-type {
-  border-bottom: 1px solid #CCC;
+  border-left: 7px solid #CCC;
   margin: 0 0 10px 0;
   font-weight: bold;
   font-size: 14px;
-  color: red;
-  padding: 3px;
+  color: #D6361C;
+  padding-left: 5px;
 }
 div#err-msg-content {
-  border-bottom: 0px solid #CCC;
+  border-left: 7px solid #D6361C;
   font-size: 12px;
   color: #666;
+  padding-left: 5px;
 }
 
 
@@ -99,7 +99,7 @@ div#footer {
   margin-top: 100px;
   padding-top: 10px;
   border-top: 1px solid #D8D8D8;
-  text-align: center;
+  text-align: right;
   color: #999999;
   font-weight: bold;
 }
