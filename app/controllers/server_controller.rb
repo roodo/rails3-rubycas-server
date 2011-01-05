@@ -339,6 +339,60 @@ class ServerController < ApplicationController
   end
 
   def logout
+    CASServer::Utils::log_controller_action(self.class, params)
+
+    # The behaviour here is somewhat non-standard. Rather than showing just a blank
+    # "logout" page, we take the user back to the login page with a "you have been logged out"
+    # message, allowing for an opportunity to immediately log back in. This makes it
+    # easier for the user to log out and log in as someone else.
+    @service = clean_service_url(params['service'] || params['destination'])
+    @continue_url = params['url']
+    @gateway = params['gateway'] == 'true' || params['gateway'] == '1'
+
+    tgt = CASServer::Model::TicketGrantingTicket.find_by_ticket(request.cookies['tgt'])
+    response.delete_cookie 'tgt'
+
+    if tgt
+      CASServer::Model::TicketGrantingTicket.transaction do
+        Rails.logger.debug("Deleting Service/Proxy Tickets for '#{tgt}' for user '#{tgt.username}'")
+        tgt.granted_service_tickets.each do |st|
+          send_logout_notification_for_service_ticket(st) if config[:enable_single_sign_out]
+          # TODO: Maybe we should do some special handling if send_logout_notification_for_service_ticket fails?
+          #       (the above method returns false if the POST results in a non-200 HTTP response).
+          Rails.logger.debug "Deleting #{st.class.name.demodulize} #{st.ticket.inspect} for service #{st.service}."
+          st.destroy
+        end
+
+        pgts = CASServer::Model::ProxyGrantingTicket.find(:all,
+          :conditions => [CASServer::Model::Base.connection.quote_table_name(CASServer::Model::ServiceTicket.table_name)+".username = ?", tgt.username],
+          :include => :service_ticket)
+        pgts.each do |pgt|
+          Rails.logger.debug("Deleting Proxy-Granting Ticket '#{pgt}' for user '#{pgt.service_ticket.username}'")
+          pgt.destroy
+        end
+
+        Rails.logger.debug("Deleting #{tgt.class.name.demodulize} '#{tgt}' for user '#{tgt.username}'")
+        tgt.destroy
+      end
+
+      Rails.logger.info("User '#{tgt.username}' logged out.")
+    else
+      Rails.logger.warn("User tried to log out without a valid ticket-granting ticket.")
+    end
+
+    @message = {:type => 'confirmation', :message => "You have successfully logged out."}
+
+    @message[:message] += " Please click on the following link to continue:" if @continue_url
+
+    @lt = generate_login_ticket
+
+    if @gateway && @service
+      return redirect @service, :status => 303
+    elsif @continue_url
+      return render :logout
+    else
+      return render :login
+    end
   end
   
   def demo
