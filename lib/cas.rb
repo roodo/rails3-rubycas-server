@@ -168,7 +168,7 @@ module CASServer::CAS
   end
   
   def validate_service_ticket(service, ticket, allow_proxy_tickets = false)
-    $LOG.debug "Validating service/proxy ticket '#{ticket}' for service '#{service}'"
+    Rails.logger.debug "Validating service/proxy ticket '#{ticket}' for service '#{service}'"
 
     if service.nil? or ticket.nil?
       error = Error.new(:INVALID_REQUEST, "Ticket or service parameter was missing in the request.")

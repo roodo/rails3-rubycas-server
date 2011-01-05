@@ -75,7 +75,7 @@ div#err-msg {
   border: 0px solid #CCC;
   margin-top: 30px;
   text-align: left;
-  margin-left: 89px;
+  margin-left: 118px;
 }
 div#err-msg-type {
   border-left: 7px solid #CCC;
@@ -89,7 +89,7 @@ div#err-msg-content {
   border-left: 7px solid #D6361C;
   font-size: 12px;
   color: #666;
-  padding-left: 5px;
+  padding: 5px;
 }
 
 

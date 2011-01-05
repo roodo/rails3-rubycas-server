@@ -8,7 +8,7 @@ class ServerController < ApplicationController
 
   include CASServer::CAS
  
-  # before_filter CASClient::Frameworks::Rails::Filter, :only => [ :demo ]
+  before_filter CASClient::Frameworks::Rails::Filter, :only => [ :demo ]
   before_filter :set_settings
   
   def set_settings
@@ -90,6 +90,7 @@ class ServerController < ApplicationController
     # 2.2.2 (required)
     @username = params['username']
     @password = params['password']
+    @remember_me = params['remember-me']
     @lt = params['lt']
 
     # Remove leading and trailing widespace from username.
@@ -149,19 +150,45 @@ class ServerController < ApplicationController
 
       # 3.6 (ticket-granting cookie)
       tgt = generate_ticket_granting_ticket(@username, extra_attributes)
-
-      if CasConf[:maximum_session_lifetime]
-        expires = CasConf[:maximum_session_lifetime].to_i.from_now
-        expiry_info = " It will expire on #{expires}."
-
-        response.set_cookie('tgt', {
-          :value => tgt.to_s,
-          :expires => expires
-        })
+      
+      if @remember_me && @remember_me == 'on'
+        if CasConf[:remember_me_session_lifetime]
+          expires = CasConf[:remember_me_session_lifetime].to_i.from_now
+          expiry_info = " It will expire on #{expires}."
+          response.set_cookie('tgt', {
+            :value => tgt.to_s,
+            :expires => expires
+          })
+        else
+          expiry_info = " It will not expire."
+          response.set_cookie('tgt', tgt.to_s)
+        end
       else
-        expiry_info = " It will not expire."
-        response.set_cookie('tgt', tgt.to_s)
+        if CasConf[:maximum_session_lifetime]
+          expires = CasConf[:maximum_session_lifetime].to_i.from_now
+          expiry_info = " It will expire on #{expires}."
+          response.set_cookie('tgt', {
+            :value => tgt.to_s,
+            :expires => expires
+          })
+        else
+          expiry_info = " It will not expire."
+          response.set_cookie('tgt', tgt.to_s)
+        end
       end
+      
+      # if CasConf[:maximum_session_lifetime]
+      #   expires = CasConf[:maximum_session_lifetime].to_i.from_now
+      #   expiry_info = " It will expire on #{expires}."
+      # 
+      #   response.set_cookie('tgt', {
+      #     :value => tgt.to_s,
+      #     :expires => expires
+      #   })
+      # else
+      #   expiry_info = " It will not expire."
+      #   response.set_cookie('tgt', tgt.to_s)
+      # end
 
       Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
 
@@ -293,7 +320,10 @@ class ServerController < ApplicationController
       @extra_attributes = st.granted_by_tgt.extra_attributes || {}
     end
 
-    render :proxy_validate, :layout => false, :status => response_status_from_error(@error) if @error
+    respond_to do |format|
+      format.html
+      format.xml { render :status => response_status_from_error(@error) if @error }
+    end
   end
   
   def proxyValidate
@@ -328,12 +358,30 @@ class ServerController < ApplicationController
       @extra_attributes = t.granted_by_tgt.extra_attributes || {}
     end
 
-    status response_status_from_error(@error) if @error
-
-   render :builder, :proxy_validate
+    respond_to do |format|
+      format.html
+      format.xml { render :status => response_status_from_error(@error) if @error  }
+    end
   end
   
   def proxy
+    CASServer::Utils::log_controller_action(self.class, params)
+
+    # required
+    @ticket = params['pgt']
+    @target_service = params['targetService']
+
+    pgt, @error = validate_proxy_granting_ticket(@ticket)
+    @success = pgt && !@error
+
+    if @success
+      @pt = generate_proxy_ticket(@target_service, pgt)
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml { render :status => response_status_from_error(@error) if @error }
+    end
   end
   
   def response_status_from_error(error)
