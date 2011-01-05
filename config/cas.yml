@@ -169,14 +169,7 @@
 # With MySQL, your config would be something like the following:
 # (be sure to create the casserver database in MySQL beforehand,
 #   i.e. `mysqladmin -u root create casserver`)
-
-database:
-  adapter: mysql2
-  database: roodo_cas_development
-  username: root
-  password: '@!wqsaxz'
-  host: 127.0.0.1
-
+#
 # IMPORTANT! By default, the server can handle up to ~5 concurrent requests
 # (without queuing). You can increase this by setting the database connection
 # pool size to a higher number. For example, to handle up to ~10 concurrent 
@@ -189,7 +182,7 @@ database:
 #  username: root
 #  password: 
 #  host: localhost
-
+#
 #
 # Instead of MySQL you can use SQLite3, PostgreSQL, MSSQL, or anything else 
 # supported by ActiveRecord.
@@ -197,12 +190,20 @@ database:
 # With SQLite3 (which does not require a separate database server), your 
 # configuration would look something like the following (don't forget to install 
 # the sqlite3-ruby gem beforehand!):
-
+#
 #database:
 #  adapter: sqlite3
 #  dbfile: /var/lib/casserver.db
-  
-
+#
+database:
+  pool: 10
+  adapter: mysql2
+  database: roodo_cas_development
+  username: root
+  password: '@!wqsaxz'
+  host: 127.0.0.1  
+#
+#
 ##### AUTHENTICATION ###########################################################
 
 # Configure how username/passwords are validated.
@@ -275,7 +276,7 @@ authenticator:
   user_table: users
   username_column: username
   password_column: password
-  extra_attributes: username
+  extra_attributes: username, email, birthday
 #
 #
 # === Google Authentication ====================================================

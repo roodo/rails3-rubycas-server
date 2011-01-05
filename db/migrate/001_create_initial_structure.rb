@@ -40,9 +40,9 @@ class CreateInitialStructure < ActiveRecord::Migration
     end
     
     create_table 'users', :force => true do |t|
-      t.string     'email',      :null => false
+      t.string     'username',   :null => false
       t.string     'password',   :null => false
-      t.string     'nickname',   :null => false
+      t.string     'email',      :null => false
       t.string     'birthday',   :null => false
       t.timestamps 'created_at', :null => false
       t.timestamps 'updated_at', :null => false

@@ -187,14 +187,14 @@ class ServerController < ApplicationController
     
     if tgt and !tgt_error
       @message = {
-        :type => 'Notice',
+        :type => 'notice',
         :message => "You are currently logged in as '%s'. If this is not you, please log in below." % tgt.username 
       }
     end
     
     if params['redirection_loop_intercepted']
       @message = {
-        :type => 'Mistake',
+        :type => 'mistake',
         :message => "The client and server are unable to negotiate authentication. Please try logging in again later."
       }
     end
@@ -213,14 +213,14 @@ class ServerController < ApplicationController
       elsif @gateway
           Rails.logger.debug("This is a gateway request but no service parameter was given!")
           @message = {
-            :type => 'Mistake',
+            :type => 'mistake',
             :message => "The server cannot fulfill this gateway request because no service parameter was given."
           }
       end
     rescue URI::InvalidURIError
       Rails.logger.debug("The service '#{@service}' is not a valid URI!")
       @message = {
-        :type => 'Mistake',
+        :type => 'mistake',
         :message => "The target service your browser supplied appears to be invalid. Please contact your system administrator for help."
       }
     end
@@ -237,7 +237,7 @@ class ServerController < ApplicationController
     @service = clean_service_url(params['service'])
 
     # 2.2.2 (required)
-    @username = params['email']
+    @username = params['username']
     @password = params['password']
     @lt = params['lt']
 
@@ -250,7 +250,7 @@ class ServerController < ApplicationController
     end
 
     if error = validate_login_ticket(@lt)
-      @message = {:type => 'Mistake', :message => error}
+      @message = {:type => 'mistake', :message => error}
       # generate another login ticket to allow for re-submitting the form
       @lt = generate_login_ticket.ticket
       return render :index, :status => 401
@@ -290,7 +290,7 @@ class ServerController < ApplicationController
       end
     rescue CASServer::AuthenticatorError => e
       Rails.logger.debug(e)
-      @message = {:type => 'Mistake', :message => e.to_s}
+      @message = {:type => 'mistake', :message => e.to_s}
       return render :index
     end
     
@@ -319,7 +319,7 @@ class ServerController < ApplicationController
 
       if @service.blank?
         Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will redirect to demo page.")
-        @message = {:type => 'Confirmation', :message => "You have successfully logged in."}
+        @message = {:type => 'confirmation', :message => "You have successfully logged in."}
         return redirect_to :action => "demo"
       else
         @st = generate_service_ticket(@service, @username, tgt)
@@ -333,14 +333,14 @@ class ServerController < ApplicationController
         rescue URI::InvalidURIError
           Rails.logger.error("The service '#{@service}' is not a valid URI!")
           @message = {
-            :type => 'Mistake',
+            :type => 'mistake',
             :message => "The target service your browser supplied appears to be invalid. Please contact your system administrator for help."
           }
         end
       end
     else
       Rails.logger.warn("Invalid credentials given for user '#{@username}'")
-      @message = {:type => 'Mistake', :message => "Incorrect username or password."}
+      @message = {:type => 'mistake', :message => "Incorrect username or password."}
       return render :index, :status => 401
     end
 
@@ -389,7 +389,7 @@ class ServerController < ApplicationController
       Rails.logger.warn("User tried to log out without a valid ticket-granting ticket.")
     end
 
-    @message = {:type => 'Confirmation', :message => "You have successfully logged out."}
+    @message = {:type => 'confirmation', :message => "You have successfully logged out."}
 
     @message[:message] += " Please click on the following link to continue:" if @continue_url
 

@@ -5,7 +5,6 @@ require 'net/https'
 require 'model'
 
 
-
 module CASServer::CAS
   
   include CASServer::Model
