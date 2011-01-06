@@ -9,7 +9,7 @@ RoodoCasServer::Application.config.cas_config = HashWithIndifferentAccess.new(
   :log => {
       :file => 'casserver.log', 
       :level => 'DEBUG'},
-  :uri_path => ""
+  :uri_path => "/server"
 )
 CasConf = RoodoCasServer::Application.config.cas_config
 

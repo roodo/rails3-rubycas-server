@@ -32,4 +32,3 @@ gem 'mysql2'
 
 gem "crypt-isaac", "~> 0.9.1"
 gem "gettext", "~> 2.1.0"
-gem "rubycas-client", "2.2.1"

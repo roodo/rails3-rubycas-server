@@ -7,8 +7,6 @@ require "cas"
 class ServerController < ApplicationController
 
   include CASServer::CAS
- 
-  before_filter CASClient::Frameworks::Rails::Filter, :only => [ :demo ]
   before_filter :set_settings
   
   def set_settings
@@ -176,26 +174,12 @@ class ServerController < ApplicationController
           response.set_cookie('tgt', tgt.to_s)
         end
       end
-      
-      # if CasConf[:maximum_session_lifetime]
-      #   expires = CasConf[:maximum_session_lifetime].to_i.from_now
-      #   expiry_info = " It will expire on #{expires}."
-      # 
-      #   response.set_cookie('tgt', {
-      #     :value => tgt.to_s,
-      #     :expires => expires
-      #   })
-      # else
-      #   expiry_info = " It will not expire."
-      #   response.set_cookie('tgt', tgt.to_s)
-      # end
 
       Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
 
       if @service.blank?
         Rails.logger.info("Successfully authenticated user '#{@username}' at '#{tgt.client_hostname}'. No service param was given, so we will redirect to demo page.")
         @message = {:type => 'confirmation', :message => "You have successfully logged in."}
-        return redirect_to :action => "demo"
       else
         @st = generate_service_ticket(@service, @username, tgt)
 
@@ -278,10 +262,7 @@ class ServerController < ApplicationController
       return render :login
     end
   end
-  
-  def demo
-  end
-  
+
   def validate
     CASServer::Utils::log_controller_action(self.class, params)
       
