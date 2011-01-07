@@ -1,4 +1,4 @@
-= roodo-cas-server 0.5
+= roodo-cas-server beta
 by www.roodo.com ( http://www.roodo.com )
 
 == LINKS:
