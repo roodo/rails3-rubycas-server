@@ -199,9 +199,9 @@ database:
   pool: 10
   adapter: mysql2
   database: roodo_cas_development
-  username: root
-  password: '@!wqsaxz'
-  host: 127.0.0.1  
+  username: 
+  password: 
+  host:  
 #
 #
 ##### AUTHENTICATION ###########################################################
@@ -270,9 +270,9 @@ authenticator:
   database:
     adapter: mysql2
     database: roodo_cas_development
-    username: root
-    password: '@!wqsaxz'
-    host: 127.0.0.1
+    username: 
+    password: 
+    host: 
   user_table: users
   username_column: username
   password_column: password
