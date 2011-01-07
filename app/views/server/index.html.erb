@@ -21,8 +21,9 @@
   <% if @message %>
     <div id="clear"></div>
     <div id="err-msg">
-      <!--<div id="err-msg-type"><%#= @message[:type] %></div>-->
-      <div id="err-msg-content"><%= @message[:message] %></div>
+      <div id="err-msg-content">
+        <%= @message[:message] %>
+      </div>
     </div>
   <% end %>
 </div>
