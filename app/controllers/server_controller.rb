@@ -260,7 +260,9 @@ class ServerController < ApplicationController
     @message = {:type => 'confirmation', :message => "You have successfully logged out."}
     @message[:message] += " Please click on the following link to continue:" if @continue_url
     @lt = generate_login_ticket
-
+    
+    Rails.logger.debug "@continue_url: #{@continue_url}"
+    
     if @gateway && @service
       return redirect @service, :status => 303
     elsif @continue_url
@@ -270,49 +272,48 @@ class ServerController < ApplicationController
     end
   end
 
-  # def validate
-  #   CASServer::Utils::log_controller_action(self.class, params)
-  #     
-  #   # required
-  #   @service = clean_service_url(params['service'])
-  #   @ticket = params['ticket']
-  #   
-  #   # optional
-  #   @renew = params['renew']
-  #   
-  #   st, @error = validate_service_ticket(@service, @ticket)      
-  #   @success = st && !@error
-  #   @username = st.username if @success
-  # 
-  #   render :validate, :layout => false, :status => response_status_from_error(@error) if @error
-  # end
+  def validate
+    CASServer::Utils::log_controller_action(self.class, params)
+         
+    # required
+    @service = clean_service_url(params['service'])
+    @ticket = params['ticket']
+       
+    # optional
+    @renew = params['renew']
+       
+    st, @error = validate_service_ticket(@service, @ticket)      
+    @success = st && !@error
+    @username = st.username if @success
+   
+    render :validate, :layout => false, :status => response_status_from_error(@error) if @error
+  end
   
-  # def serviceValidate 
-  #   CASServer::Utils::log_controller_action(self.class, params)
-  # 
-  #   # required
-  #   @service = clean_service_url(params['service'])
-  #   @ticket = params['ticket']
-  #   
-  #   # optional
-  #   @renew = params['renew']
-  # 
-  #   st, @error = validate_service_ticket(@service, @ticket)
-  #   @success = st && !@error
-  #   if @success
-  #     @username = st.username
-  #     if @pgt_url
-  #       pgt = generate_proxy_granting_ticket(@pgt_url, st)
-  #       @pgtiou = pgt.iou if pgt
-  #     end
-  #     @extra_attributes = st.granted_by_tgt.extra_attributes || {}
-  #   end
-  # 
-  #   respond_to do |format|
-  #     format.html
-  #     format.xml { render :status => response_status_from_error(@error) if @error }
-  #   end
-  # end
+  def serviceValidate 
+    CASServer::Utils::log_controller_action(self.class, params)
+  
+    # required
+    @service = clean_service_url(params['service'])
+    @ticket = params['ticket']
+    
+    # optional
+    @renew = params['renew']
+  
+    st, @error = validate_service_ticket(@service, @ticket)
+    @success = st && !@error
+    if @success
+      @username = st.username
+      if @pgt_url
+        pgt = generate_proxy_granting_ticket(@pgt_url, st)
+        @pgtiou = pgt.iou if pgt
+      end
+      @extra_attributes = st.granted_by_tgt.extra_attributes || {}
+    end
+  
+    respond_to do |format|
+      format.xml { render :status => response_status_from_error(@error) if @error }
+    end
+  end
   
   def proxyValidate
     CASServer::Utils::log_controller_action(self.class, params)
@@ -333,6 +334,7 @@ class ServerController < ApplicationController
     @extra_attributes = {}
     if @success
       @username = t.username
+      Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - #{@username}"
       if t.kind_of? CASServer::Model::ProxyTicket
         @proxies << t.granted_by_pgt.service_ticket.service
       end
@@ -344,32 +346,31 @@ class ServerController < ApplicationController
      
       @extra_attributes = t.granted_by_tgt.extra_attributes || {}
     end
-     
+    Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - @username: #{@username}"
+    Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - @success: #{@success}" 
     respond_to do |format|
-    #   format.html
        format.xml { render :status => response_status_from_error(@error) if @error  }
     end
   end
   
-  # def proxy
-  #   CASServer::Utils::log_controller_action(self.class, params)
-  # 
-  #   # required
-  #   @ticket = params['pgt']
-  #   @target_service = params['targetService']
-  # 
-  #   pgt, @error = validate_proxy_granting_ticket(@ticket)
-  #   @success = pgt && !@error
-  # 
-  #   if @success
-  #     @pt = generate_proxy_ticket(@target_service, pgt)
-  #   end
-  # 
-  #   respond_to do |format|
-  #     format.html
-  #     format.xml { render :status => response_status_from_error(@error) if @error }
-  #   end
-  # end
+  def proxy
+    CASServer::Utils::log_controller_action(self.class, params)
+  
+    # required
+    @ticket = params['pgt']
+    @target_service = params['targetService']
+  
+    pgt, @error = validate_proxy_granting_ticket(@ticket)
+    @success = pgt && !@error
+  
+    if @success
+      @pt = generate_proxy_ticket(@target_service, pgt)
+    end
+  
+    respond_to do |format|
+      format.xml { render :status => response_status_from_error(@error) if @error }
+    end
+  end
   
   def response_status_from_error(error)
     case error.code.to_s
