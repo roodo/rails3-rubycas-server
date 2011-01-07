@@ -10,7 +10,7 @@ class ServerController < ApplicationController
   before_filter :set_settings
   
   def set_settings
-    #response.headers['Content-Type'] = 'text/html; charset=UTF-8'
+    response.headers['Content-Type'] = 'text/html; charset=UTF-8'
     @theme = CasConf[:theme] if CasConf[:theme]
     @organization = CasConf[:organization] if CasConf[:organization]
     @infoline = CasConf[:infoline] if CasConf[:infoline]
@@ -194,7 +194,6 @@ class ServerController < ApplicationController
 
         begin
           service_with_ticket = service_uri_with_ticket(@service, @st)
-
           Rails.logger.info("Redirecting authenticated user '#{@username}' at '#{@st.client_hostname}' to service '#{@service}'")
           #redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
           return redirect_to service_with_ticket, :status => 303
@@ -334,7 +333,6 @@ class ServerController < ApplicationController
     @extra_attributes = {}
     if @success
       @username = t.username
-      Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - #{@username}"
       if t.kind_of? CASServer::Model::ProxyTicket
         @proxies << t.granted_by_pgt.service_ticket.service
       end
@@ -346,8 +344,7 @@ class ServerController < ApplicationController
      
       @extra_attributes = t.granted_by_tgt.extra_attributes || {}
     end
-    Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - @username: #{@username}"
-    Rails.logger.debug "[#{__FILE__}] [#{__LINE__}] - @success: #{@success}" 
+    
     respond_to do |format|
        format.xml { render :status => response_status_from_error(@error) if @error  }
     end
@@ -372,25 +369,25 @@ class ServerController < ApplicationController
     end
   end
   
-  def response_status_from_error(error)
-    case error.code.to_s
-    when /^INVALID_/, 'BAD_PGT'
-      422
-    when 'INTERNAL_ERROR'
-      500
-    else
-      500
-    end
-  end
-
-  def serialize_extra_attribute(builder, value)
-    if value.kind_of?(String)
-      builder.text! value
-    elsif value.kind_of?(Numeric)
-      builder.text! value.to_s
-    else
-      builder.cdata! value.to_yaml
-    end
-  end
+  # def response_status_from_error(error)
+  #   case error.code.to_s
+  #   when /^INVALID_/, 'BAD_PGT'
+  #     422
+  #   when 'INTERNAL_ERROR'
+  #     500
+  #   else
+  #     500
+  #   end
+  # end
+  # 
+  # def serialize_extra_attribute(builder, value)
+  #   if value.kind_of?(String)
+  #     builder.text! value
+  #   elsif value.kind_of?(Numeric)
+  #     builder.text! value.to_s
+  #   else
+  #     builder.cdata! value.to_yaml
+  #   end
+  # end
   
 end
