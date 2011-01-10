@@ -298,7 +298,7 @@ authenticator:
 #     server: localhost
 #   user_table: users
 #   username_column: email_address
-#   encrypt_function: 'user.crypted_password == Digest::SHA1.hexdigest("--#{user.salt}--#{@password}--")'
+#   encrypt_function: 'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
 #   
 # authenticator:
 #   class: CASServer::Authenticators::SQLMd5
