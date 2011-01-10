@@ -95,11 +95,6 @@ class ServerController < ApplicationController
     @remember_me = params['remember-me']
     @lt = params['lt']
     
-    Rails.logger.debug "@username: #{@username}"
-    Rails.logger.debug "@password: #{@password}"
-    Rails.logger.debug "@remember_me: #{@remember_me}"
-    Rails.logger.debug "@lt: #{@lt}"
-
     # Remove leading and trailing widespace from username.
     @username.strip! if @username
     
@@ -150,7 +145,7 @@ class ServerController < ApplicationController
       @message = {:type => 'mistake', :message => e.to_s}
       return render :index
     end
-
+    
     if credentials_are_valid
       Rails.logger.info("Credentials for username '#{@username}' successfully validated using #{successful_authenticator.class.name}.")
       Rails.logger.debug("Authenticator provided additional user attributes: #{extra_attributes.inspect}") unless extra_attributes.blank?

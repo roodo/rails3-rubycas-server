@@ -2,7 +2,7 @@
 
 require 'active_record'
 require 'active_record/base'
-
+require 'authenticators/sql_encrypted'
 
 
 module CASServer::Model
@@ -37,7 +37,7 @@ module CASServer::Model
   class Base < ActiveRecord::Base
   end
   
-  class Users < ActiveRecord::Base
+  class User < ActiveRecord::Base
   end
   
   class Ticket < Base
