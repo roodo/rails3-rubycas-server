@@ -1,5 +1,6 @@
-require 'authenticators/sql'
+#encoding: utf-8
 
+require 'authenticators/sql'
 require 'digest/md5'
 
 # Essentially the same as the standard SQL authenticator, but this version
