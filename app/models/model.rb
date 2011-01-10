@@ -2,7 +2,11 @@
 
 require 'active_record'
 require 'active_record/base'
-require 'authenticators/sql_encrypted'
+
+# If you enable the CASServer::Authenticators::SQLEncrypted in your config file 
+# ( ex: config/cas.yml ), you need to enable following line.
+# You can find out more information on http://code.google.com/p/rubycas-server/wiki/UsingTheSQLEncryptedAuthenticator
+#require 'authenticators/sql_encrypted'
 
 
 module CASServer::Model
@@ -38,6 +42,10 @@ module CASServer::Model
   end
   
   class User < ActiveRecord::Base
+    # If you enable the CASServer::Authenticators::SQLEncrypted in your config file 
+    # ( ex: config/cas.yml ), you need to enable following line.
+    # You can find out more information on http://code.google.com/p/rubycas-server/wiki/UsingTheSQLEncryptedAuthenticator
+    #include CASServer::Authenticators::SQLEncrypted::EncryptedPassword
   end
   
   class Ticket < Base
