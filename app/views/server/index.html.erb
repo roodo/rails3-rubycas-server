@@ -1,5 +1,5 @@
 <div id="left-splash">
-  <%= form_tag "/server/login" do %>
+  <%= form_tag "#{CasConf["uri_path"]}/login" do %>
     <div>
       <%= label_tag "username", "Username" %>
       <%= text_field_tag "username", nil, {:tabIndex => 1} %>

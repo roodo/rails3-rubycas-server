@@ -50,19 +50,18 @@ RoodoCasServer::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => "server#index"
-  
-  get  "server/index"
-  post "server/login"
-  get  "server/logout"
-  get  "server/validate"
-  get  "server/serviceValidate"
-  get  "server/proxyValidate"
-  get  "server/proxy"
+  # root :to => "welcome#index"
   
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id(.:format)))'
+  match "#{CasConf["uri_path"]}/login", :to => "server#index", :via => "get"
+  match "#{CasConf["uri_path"]}/login", :to => "server#login", :get => "post"
+  match "#{CasConf["uri_path"]}/logout", :to => "server#logout", :get => "get"
+  match "#{CasConf["uri_path"]}/validate", :to => "server#validate", :get => "get"
+  match "#{CasConf["uri_path"]}/serviceValidate", :to => "server#serviceValidate", :get => "get"
+  match "#{CasConf["uri_path"]}/proxyValidate", :to => "server#proxyValidate", :get => "get"
+  match "#{CasConf["uri_path"]}/proxy", :to => "server#proxy", :get => "get"
 end
