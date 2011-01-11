@@ -1,162 +1,12 @@
-# IMPORTANT NOTE ABOUT YAML CONFIGURATION FILES
-# ---> Be sure to use spaces instead of tabs for indentation. YAML is 
-#      white-space sensitive!
+#encoding: utf-8
 
-##### SERVER SETUP ################################################################
-
-# There are several ways to run RubyCAS-Server:
-#
-# webrick   -- stand-alone WEBrick server; should work out-of-the-box; this is 
-#              the default method, but probably not suited for high-traffic usage
-# mongrel   -- stand-alone Mongrel server; fast, but you'll need to  install  
-#              and compile Mongrel and run it behind an https reverse proxy like 
-#              Pound or Apache 2.2's mod_proxy (since Mongrel cannot serve out
-#              over SSL on its own).
-# passenger -- served out by Apache via the mod_rails/mod_rack module
-#              (see http://www.modrails.com/)
-#
-# The following are exampe configurations for each of these three methods:
-#
-
-
-###
-### WEBrick example
-###
-# WEBrick is a simple, all-Ruby web server. This is the easiest method for running
-# RubyCAS-Server. All you need is an SSL certificate (enter its path under the
-# ssl_cert option). WEBrick is fine for sites with low to medium traffic, but for
-# high-performance scenarios you may want to look into deploying using Mongrel
-# or Passenger.
-
-#server: webrick
-#port: 3000
-#ssl_cert: /path/to/your/ssl.pem
-
-# If your private key is in a separate file from the cert
-
-#ssl_key: /path/to/your/private_key.pem
-
-# If you do not already have an SSL certificate and would like to automatically
-# generate one, run the "generate_ssl_certificate" rake task and use the following 
-# settings:
-
-#  ssl_cert: ssl/cert.pem
-#  ssl_key: ssl/key.pem
-
-###
-### Proxy support (Google, etc)
-###
-# If your server is behind a proxy you can uncomment the following lines in order
-# to activate proxy support:
-#
-#  proxy_host: your-proxy-server
-#  proxy_port: 8080
-#  proxy_username: nil
-#  proxy_passsword: nil
 
 
 # By default the login page will be available at the root path 
 # (e.g. https://login.example.net/). The uri_path option lets you serve it from a 
 # different path (e.g. https://login.example.net/cas).
-
 uri_path: /cas
 
-
-# This lets you bind the server to a specific address. Use 0.0.0.0 to listen on
-# all available interfaces (this is the default).
-
-#bind_address: 0.0.0.0
-
-
-###
-### Mongrel example 
-###
-# Mongrel is much faster than WEBrick, but there are two caveats:
-#  1. Since Mongrel can't serve out encrypted HTTP on its own (and CAS requires this),
-#     you will have to set up a reverse proxy like Pound or Apache's mod_proxy and
-#     route through it requests to the Mongrel server. So for example,
-#     your Pound server will receive all of the requests to RubyCAS-Server on port 443,
-#     and forward them to the Mongrel server listening on port 11011.
-#  2. Some of Mongrel's components are compiled into native binaries, so if you are 
-#     installing on Linux, make sure you have all of the standard build tools
-#     available. The binaries should be automatically compiled for you when you
-#     install the mogrel gem (if you're runnings Windows, pre-compiled
-#     binaries will be downloaded and installed, so don't worry about this).
-
-#server: mongrel
-#port: 11011
-
-
-# Bind the server to a specific address. Use 0.0.0.0 to listen on all
-# available interfaces (this is the default).
-
-#bind_address: 0.0.0.0
-
-### Reverse proxy configuration examples
-# If you're using mod_proxy, your Apache vhost config should look something like this:
-#
-#  Listen 443
-#  <VirtualHost *:443>
-#    ServerAdmin admin@example.net
-#    ServerName login.example.net
-#  
-#    SSLEngine On
-#    SSLCertificateFile /etc/apache2/ssl.crt/example.pem
-#  
-#    # Don't do forward proxying, we only want reverse proxying
-#    ProxyRequests Off
-#  
-#    <Proxy balancer://rubycas>
-#      Order allow,deny
-#      Allow from all
-#      BalancerMember http://127.0.0.1:11011
-#    </Proxy>
-#  </VirtualHost>
-#
-# For Pound, the config should be something like:
-#
-#  ListenHTTPS
-#    Address 0.0.0.0
-#    Port    11011
-#    Cert    "/etc/ssl/example.pem"
-#  
-#    Service
-#      BackEnd
-#        Address localhost
-#        Port    443
-#      End
-#    End
-#  End
-
-
-###
-### Phusion Passenger (running under Apache configured for SSL)
-###
-
-# No additional configuration is requried to run RubyCAS-Server under
-# passsenger. Just follow the normal instructions for a Passenger app
-# (see http://www.modrails.com/).
-#
-# Here's an example Apache vhost config for RubyCAS-Server and Passenger:
-#
-#  Listen 443
-#  <VirtualHost *:443>
-#     ServerAdmin admin@example.net
-#     ServerName login.example.net
-#
-#     SSLEngine On
-#     SSLCertificateFile /etc/apache2/ssl.crt/example.pem
-#
-#     RailsAutoDetect off
-#
-#     DocumentRoot /usr/lib/ruby/gems/1.8/gems/rubycas-server-0.8.0/public
-#
-#     <Directory "/usr/lib/ruby/gems/1.8/gems/rubycas-server-0.8.0/public">
-#       AllowOverride all
-#       Allow from all
-#     </Directory>
-#  </VirtualHost>
-#
 
 
 ##### DATABASE #################################################################
@@ -183,6 +33,13 @@ uri_path: /cas
 #  password: 
 #  host: localhost
 #
+database:
+  pool: 10
+  adapter: mysql2
+  database: some_database_with_users_table
+  username: 
+  password: 
+  host: 
 #
 # Instead of MySQL you can use SQLite3, PostgreSQL, MSSQL, or anything else 
 # supported by ActiveRecord.
@@ -194,16 +51,9 @@ uri_path: /cas
 #database:
 #  adapter: sqlite3
 #  dbfile: /var/lib/casserver.db
-#
-database:
-  pool: 10
-  adapter: mysql2
-  database: roodo_cas_development
-  username:
-  password:
-  host:
-#
-#
+
+
+
 ##### AUTHENTICATION ###########################################################
 
 # Configure how username/passwords are validated.
@@ -224,18 +74,19 @@ database:
 # 
 # Example:
 #
-#authenticator:
-#  class: CASServer::Authenticators::SQL
-#  database:
-#    adapter: mysql
-#    database: some_database_with_users_table
-#    username: root
-#    password: 
-#    host: localhost
-#  user_table: users
-#  username_column: username
-#  password_column: password
+authenticator:
+  class: CASServer::Authenticators::SQL
+  database:
+    adapter: mysql2
+    database: some_database_with_users_table
+    username: 
+    password: 
+    host: 
+  user_table: users
+  username_column: username
+  password_column: password
 #
+# === SQL Authentication with extra_attributes ==================================
 #
 # When replying to a CAS client's validation request, the server will normally
 # provide the client with the authenticated user's username. However it is
@@ -254,25 +105,31 @@ database:
 #authenticator:
 #  class: CASServer::Authenticators::SQL
 #  database:
-#    adapter: mysql
+#    adapter: mysql2
 #    database: some_database_with_users_table
+#    username: 
+#    password: 
+#    host: 
 #  user_table: users
 #  username_column: username
 #  password_column: password
 #  extra_attributes: full_name, access_level
 #
-authenticator:
-  class: CASServer::Authenticators::SQL
-  database:
-    adapter: mysql2
-    database: roodo_cas_development
-    username:
-    password:
-    host:
-  user_table: users
-  username_column: username
-  password_column: password
-  extra_attributes: username, email, birthday
+# === SQL Authentication with MD5 ==============================================
+#
+# authenticator:
+#   class: CASServer::Authenticators::SQLMd5
+#   database:
+#     adapter: mysql2
+#     database: some_database_with_users_table
+#     username: 
+#     password: 
+#     host: 
+#   user_table: users
+#   username_column: username
+#   password_column: password
+#   extra_attributes: username, email, birthday
+#
 #
 # The plain SQL authenticator expects user passwords to be stored as plain text in your SQL database. 
 # This makes deploying the SQL authenticator easy, but poses an obvious security risk (not necessarily 
@@ -291,213 +148,15 @@ authenticator:
 # authenticator:
 #   class: CASServer::Authenticators::SQLEncrypted
 #   database:
-#     adapter: mysql
-#     database: some_database_with_users_table
-#     username: root
-#     password: 
-#     server: localhost
-#   user_table: users
-#   username_column: email_address
-#   encrypt_function: 'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
-#   
-# authenticator:
-#   class: CASServer::Authenticators::SQLMd5
-#   database:
 #     adapter: mysql2
-#     database: roodo_cas_development
+#     database: some_database_with_users_table
 #     username: 
 #     password: 
-#     server:
+#     server: 
 #   user_table: users
 #   username_column: username
-#   encrypt_function: 'user.encrypted_password == Digest::MD5.hexdigest("#{user.encryption_salt}::#{@password}")'
-#
-#
-#
-# === Google Authentication ====================================================
-#
-# The Google authenticator allows users to log in to your CAS server using
-# their Google account credentials (i.e. the same email and password they
-# would use to log in to Google services like Gmail). This authenticator
-# requires no special configuration -- just specify its class name:
-#
-#authenticator:
-#  class: CASServer::Authenticators::Google
-#
-# Note that as with all authenticators, it is possible to use the Google 
-# authenticator alongside other authenticators. For example, CAS can first
-# attempt to validate the account with Google, and if that fails, fall back
-# to some other local authentication mechanism.
-#
-# For example:
-#
-#authenticator:
-#  - class: CASServer::Authenticators::Google
-#  - class: CASServer::Authenticators::SQL
-#    database:
-#      adapter: mysql
-#      database: some_database_with_users_table
-#      username: root
-#      password:
-#      host: localhost
-#    user_table: user
-#    username_column: username
-#    password_column: password
-#
-#
-# === ActiveDirectory Authentication ===========================================
-#
-# This method authenticates against Microsoft's Active Directory using LDAP.
-# You must configure the ActiveDirectory server, and base DN. The port number
-# and LDAP filter are optional. You must also enter a CN and password
-# for a special "authenticator" user. This account is used to log in to
-# the ActiveDirectory server and search LDAP. This does not have to be an
-# administrative account -- it only has to be able to search for other
-# users.
-# 
-# Note that the auth_user parameter must be the user's CN (Common Name).
-# In Active Directory, the CN is genarally the user's full name, which is usually
-# NOT the same as their username (sAMAccountName).
-#
-# For example:
-#
-#authenticator: 
-#  class: CASServer::Authenticators::ActiveDirectoryLDAP
-#  ldap:
-#    host: ad.example.net
-#    port: 389
-#    base: dc=example,dc=net
-#    filter: (objectClass=person)
-#    auth_user: authenticator
-#    auth_password: itsasecret
-#
-# A more complicated example, where the authenticator will use TLS encryption,
-# will ignore users with disabled accounts, and will pass on the 'cn' and 'mail' 
-# attributes to CAS clients:
-#
-#authenticator:
-#  class: CASServer::Authenticators::ActiveDirectoryLDAP
-#  ldap:
-#    host: ad.example.net
-#    port: 636
-#    base: dc=example,dc=net
-#    filter: (objectClass=person) & !(msExchHideFromAddressLists=TRUE)
-#    auth_user: authenticator
-#    auth_password: itsasecret
-#    encryption: simple_tls
-#  extra_attributes: cn, mail
-#
-# It is possible to authenticate against Active Directory without the
-# authenticator user, but this requires that users type in their CN as
-# the username rather than typing in their sAMAccountName. In other words
-# users will likely have to authenticate by typing their full name,
-# rather than their username. If you prefer to do this, then just
-# omit the auth_user and auth_password values in the above example.
-#
-#
-# === LDAP Authentication ======================================================
-#
-# This is a more general version of the ActiveDirectory authenticator.
-# The configuration is similar, except you don't need an authenticator
-# username or password. The following example has been reported to work 
-# for a basic OpenLDAP setup.
-#
-#authenticator:
-#  class: CASServer::Authenticators::LDAP
-#  ldap:
-#    host: ldap.example.net
-#    port: 389
-#    base: dc=example,dc=net
-#    username_attribute: uid
-#    filter: (objectClass=person)
-#
-# If you need more secure connections via TSL, specify the 'encryption'
-# option and change the port. This example also forces the authenticator
-# to connect using a special "authenticator" user with the given
-# username and password (see the ActiveDirectoryLDAP authenticator
-# explanation above):
-#
-#authenticator:
-#  class: CASServer::Authenticators::LDAP
-#  ldap:
-#    host: ldap.example.net
-#    port: 636
-#    base: dc=example,dc=net
-#    filter: (objectClass=person)
-#    encryption: simple_tls
-#    auth_user: cn=admin,dc=example,dc=net
-#    auth_password: secret
-#
-# If you need additional data about the user passed to the client (for example,
-# their 'cn' and 'mail' attributes, you can specify the list of attributes
-# under the extra_attributes config option: 
-#
-#authenticator:
-#  class: CASServer::Authenticators::LDAP
-#  ldap:
-#    host: ldap.example.net
-#    port: 389
-#    base: dc=example,dc=net
-#    filter: (objectClass=person)
-#  extra_attributes: cn, mail
-#
-# Note that the above functionality is somewhat limited by client compatibility.
-# See the SQL authenticator notes above for more info.
-#
-#
-# === Custom Authentication ====================================================
-#
-# It should be relatively easy to write your own Authenticator class. Have a look
-# at the built-in authenticators in the casserver/authenticators directory. Your
-# authenticator should extend the CASServer::Authenticators::Base class and must
-# implement a validate() method that takes a single hash argument. When the user 
-# submits the login form, the username and password they entered is passed to 
-# validate() as a hash under :username and :password keys. In the future, this 
-# hash might also contain other data such as the domain that the user is logging 
-# in to.
-#
-# To use your custom authenticator, specify it's class name and path to the 
-# source file in the authenticator section of the config. Any other parameters 
-# you specify in the authenticator configuration will be passed on to the 
-# authenticator and made availabe in the validate() method as an @options hash.
-#
-# Example:
-#
-#authenticator:
-#  class: FooModule::MyCustomAuthenticator
-#  source: /path/to/source.rb
-#  option_a: foo
-#  another_option: yeeha
-#
-# === Multiple Authenticators ==================================================
-#
-# If you need to have more than one source for authentication, such as an LDAP 
-# directory and a database, you can use multiple authenticators by making 
-# :authenticator an array of authenticators.
-#
-#authenticator:
-#  -
-#    class: CASServer::Authenticators::ActiveDirectoryLDAP
-#    ldap:
-#      host: ad.example.net
-#      port: 389
-#      base: dc=example,dc=net
-#      filter: (objectClass=person)
-#  -
-#    class: CASServer::Authenticators::SQL
-#    database:
-#      adapter: mysql
-#      database: some_database_with_users_table
-#      username: root
-#      password:
-#      host: localhost
-#    user_table: user
-#    username_column: username
-#    password_column: password
-#
-# During authentication, the user credentials will be checked against the first
-# authenticator and on failure fall through to the second authenticator.
-#
+#   encrypt_function: 'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
+
 
 
 ##### LOOK & FEEL ##############################################################
@@ -523,8 +182,7 @@ organization: JUT Living Development Co., Ltd
 #infoline: Powered by <a href="http://code.google.com/p/rubycas-server/">RubyCAS-Server</a>
 infoline: Copyright © 2010, JUT Living Development Co., Ltd
 
-# Custom views file.  Overrides methodes in lib/casserver/views.rb
-#custom_views_file: /path/to/custom/views.rb
+
 
 ##### LOCALIZATION (L10N) #######################################################
 # The server will attempt to detect the user's locale and show text in the 
@@ -552,6 +210,8 @@ infoline: Copyright © 2010, JUT Living Development Co., Ltd
 #
 default_locale: en
 
+
+
 ##### LOGGING ##################################################################
 
 # Configure general logging. This log is where you'll want to look in case of 
@@ -573,6 +233,7 @@ db_log:
   file: /var/log/casserver_db.log
 
 
+
 ##### SINGLE SIGN-OUT ##########################################################
 
 # When a user logs in to a CAS-enabled client application, that application
@@ -591,6 +252,7 @@ db_log:
 # is planned for a future release.
 
 #enable_single_sign_out: true
+
 
 
 ##### OTHER ####################################################################
@@ -620,5 +282,4 @@ remember_me_session_lifetime: 1209600
 # option is set to true, if the user enters "JSmith" as their username, the 
 # system will automatically
 # convert this to "jsmith".
-
 downcase_username: true
