@@ -12,12 +12,22 @@ A clone of the rubycas-server, providing a cross-domain single sign-on solution 
 == REQUIREMENTS:
 
 * gem install rails ( > 3.0.3 )
-* gem install unicorn
 * gem install mysql2
 * gem install crypt-isaac ( ~> 0.9.1 )
 * gem install gettext ( ~> 2.1.0 )
 
 == INSTALL:
+
+== Use SQLEncrypted Authenticator
+
+== Use SQLEncrypted Authenticator
+
+== Use SQLMd5 Authenticator
+
+Add following line to the lib/authenticators/sql_encrypted.rb
+  require 'digest/md5'  
+Add following line to configuration file (by default located in /config/cas.yml).
+  user.encrypted_password == Digest::MD5.hexdigest("#{@password}#{user.password_salt}")
 
 == LICENSE:
 
