@@ -38,11 +38,9 @@ You can modify it to suit your app, it will look like following (use SHA1 for ex
   'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
 
 == Use SQLMd5 Authenticator
-
-Add following line to the lib/authenticators/sql_encrypted.rb
-  require 'digest/md5'  
-Modify your 'encrypt_function' in configuration file (by default located in /config/cas.yml).
-  encrypt_function: 'user.encrypted_password == Digest::MD5.hexdigest("#{user.encryption_salt}::#{@password}")'
+  
+Modify your Authenticators Class in configuration file (by default located in /config/cas.yml).
+  class: CASServer::Authenticators::SQLMd5
 
 == LICENSE:
 
