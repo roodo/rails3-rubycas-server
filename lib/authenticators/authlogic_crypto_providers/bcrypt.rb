@@ -1,3 +1,6 @@
+#encoding: utf-8
+
+
 begin
   require "bcrypt"
 rescue LoadError

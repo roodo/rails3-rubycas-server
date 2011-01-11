@@ -1,3 +1,6 @@
+#encoding: utf-8
+
+
 require "digest/sha2"
 
 module Authlogic

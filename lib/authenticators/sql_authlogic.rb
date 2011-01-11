@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require 'casserver/authenticators/sql'
 
 # These were pulled directly from Authlogic, and new ones can be added
