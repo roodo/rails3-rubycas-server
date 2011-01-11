@@ -24,7 +24,7 @@ You need to find out and modify the configuration that look something like follo
   authenticator:
     class: CASServer::Authenticators::SQLEncrypted
     database:
-      adapter: mysql
+      adapter: mysql2
       database: some_database_with_users_table
       username: 
       password: 
@@ -46,7 +46,7 @@ And your configuration should look something like following
     class: CASServer::Authenticators::SQLMd5
     database:
       adapter: mysql2
-      database: roodo_cas_development
+      database: some_database_with_users_table
       username: 
       password: 
       host: 
