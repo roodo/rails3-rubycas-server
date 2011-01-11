@@ -41,6 +41,19 @@ You can modify it to suit your app, it will look like following (use SHA1 for ex
   
 Modify your Authenticators Class in configuration file (by default located in /config/cas.yml).
   class: CASServer::Authenticators::SQLMd5
+And your configuration should look something like following
+  authenticator:
+    class: CASServer::Authenticators::SQLMd5
+    database:
+      adapter: mysql2
+      database: roodo_cas_development
+      username: root
+      password: '@!wqsaxz'
+      host: 127.0.0.1
+    user_table: users
+    username_column: username
+    password_column: password
+    extra_attributes: username, email, birthday
 
 == LICENSE:
 
