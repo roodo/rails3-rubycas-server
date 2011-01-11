@@ -20,7 +20,22 @@ A clone of the rubycas-server, providing a cross-domain single sign-on solution 
 
 == Use SQLEncrypted Authenticator
 
-== Use SQLEncrypted Authenticator
+You need to find out and modify the configuration that look something like following (by default located in /config/cas.yml).
+  authenticator:
+    class: CASServer::Authenticators::SQLEncrypted
+    database:
+      adapter: mysql
+      database: some_database_with_users_table
+      username: root
+      password: 
+      server: localhost
+    user_table: users
+    username_column: email_address
+    encrypt_function: 'user.encrypted_password == Digest::SHA256.hexdigest("#{user.encryption_salt}::#{@password}")'
+The default value of encrypt_function is 
+  'user.encrypted_password == Digest::SHA256.hexdigest("#{user.encryption_salt}::#{@password}")'
+You can modify it to suit your app, it will look like following (use SHA1 for example)
+  'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
 
 == Use SQLMd5 Authenticator
 
