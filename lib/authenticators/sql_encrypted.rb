@@ -3,8 +3,6 @@
 require 'authenticators/sql'
 require 'digest/sha1'
 require 'digest/sha2'
-
-$: << File.dirname(File.expand_path(__FILE__)) + "/../../../vendor/isaac_0.9.1"
 require 'crypt-isaac'
 
 
