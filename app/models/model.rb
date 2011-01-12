@@ -3,11 +3,6 @@
 require 'active_record'
 require 'active_record/base'
 
-# If you enable the CASServer::Authenticators::SQLEncrypted in your config file 
-# ( ex: config/cas.yml ), you need to enable following line.
-# You can find out more information on http://code.google.com/p/rubycas-server/wiki/UsingTheSQLEncryptedAuthenticator
-#require 'authenticators/sql_encrypted'
-
 
 module CASServer::Model
 
@@ -29,7 +24,7 @@ module CASServer::Model
                           Time.now - max_unconsumed_lifetime]
           expired_tickets_count = count(:conditions => conditions)
 
-          $LOG.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
+          Rails.logger.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
             "#{'s' if expired_tickets_count > 1}.") if expired_tickets_count > 0
 
           destroy_all(conditions)
@@ -42,10 +37,6 @@ module CASServer::Model
   end
   
   class User < ActiveRecord::Base
-    # If you enable the CASServer::Authenticators::SQLEncrypted in your config file 
-    # ( ex: config/cas.yml ), you need to enable following line.
-    # You can find out more information on http://code.google.com/p/rubycas-server/wiki/UsingTheSQLEncryptedAuthenticator
-    #include CASServer::Authenticators::SQLEncrypted::EncryptedPassword
   end
   
   class Ticket < Base
@@ -58,7 +49,7 @@ module CASServer::Model
         conditions = ["created_on < ?", Time.now - max_lifetime]
         expired_tickets_count = count(:conditions => conditions)
 
-        $LOG.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
+        Rails.logger.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
           "#{'s' if expired_tickets_count > 1}.") if expired_tickets_count > 0
 
         destroy_all(conditions)
