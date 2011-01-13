@@ -1,6 +1,7 @@
 #encoding: utf-8
 
 module CASServer::Model
+  
   module Consumable
     def consume!
       self.consumed = Time.now
@@ -27,7 +28,25 @@ module CASServer::Model
       end
     end
   end
-
+  
+  module Common
+    def to_s
+      ticket
+    end
+  
+    def self.cleanup(max_lifetime)
+      transaction do
+        conditions = ["created_on < ?", Time.now - max_lifetime]
+        expired_tickets_count = count(:conditions => conditions)
+  
+        Rails.logger.debug("Destroying #{expired_tickets_count} expired #{self.name.demodulize}"+
+          "#{'s' if expired_tickets_count > 1}.") if expired_tickets_count > 0
+  
+        destroy_all(conditions)
+      end
+    end
+  end
+  
   class Error
     attr_reader :code, :message
 
@@ -40,4 +59,5 @@ module CASServer::Model
       message
     end
   end
+  
 end
