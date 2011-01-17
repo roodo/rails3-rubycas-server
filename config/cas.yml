@@ -9,51 +9,6 @@ uri_path: /cas
 
 
 
-##### DATABASE #################################################################
-
-# Set up the database connection. Make sure that this database is secure!
-# 
-# By default, we use MySQL, since it is widely used and does not require any 
-# additional ruby libraries besides ActiveRecord.
-#
-# With MySQL, your config would be something like the following:
-# (be sure to create the casserver database in MySQL beforehand,
-#   i.e. `mysqladmin -u root create casserver`)
-#
-# IMPORTANT! By default, the server can handle up to ~5 concurrent requests
-# (without queuing). You can increase this by setting the database connection
-# pool size to a higher number. For example, to handle up to ~10 concurrent 
-# requests:
-#
-#database:
-#  pool: 10
-#  adapter: mysql
-#  database: casserver
-#  username: root
-#  password: 
-#  host: localhost
-#
-database:
-  pool: 10
-  adapter: mysql2
-  database: some_database_with_users_table
-  username: 
-  password: 
-  host: 
-#
-# Instead of MySQL you can use SQLite3, PostgreSQL, MSSQL, or anything else 
-# supported by ActiveRecord.
-#
-# With SQLite3 (which does not require a separate database server), your 
-# configuration would look something like the following (don't forget to install 
-# the sqlite3-ruby gem beforehand!):
-#
-#database:
-#  adapter: sqlite3
-#  dbfile: /var/lib/casserver.db
-
-
-
 ##### AUTHENTICATION ###########################################################
 
 # Configure how username/passwords are validated.
@@ -78,9 +33,9 @@ authenticator:
   class: CASServer::Authenticators::SQL
   database:
     adapter: mysql2
-    database: some_database_with_users_table
-    username: 
-    password: 
+    database: roodo_cas_development
+    username:
+    password:
     host: 
   user_table: users
   username_column: username
@@ -184,54 +139,14 @@ infoline: Copyright © 2010, JUT Living Development Co., Ltd
 
 
 
-##### LOCALIZATION (L10N) #######################################################
-# The server will attempt to detect the user's locale and show text in the 
-# appropriate language based on:
-#
-#   1. The 'lang' URL parameter (if any)
-#   2. The 'lang' cookie (if any)
-#   3. The HTTP_ACCEPT_LANGUAGE header supplied by the user's browser.
-#   4. The HTTP_USER_AGENT header supplied by the user's browser.
-#
-# If the locale cannot be established based on one of the above checks (in the 
-# shown order), then the below 'default_locale' option will be used.
-#
-# The format is the same as standard linux locales (langagecode_COUNTRYCODE): 
-#
-#   ru_RU - Russian, Russia
-#   eo_AQ - Esperanto, Antarctica 
-#   
-# It will also work if you leave out the region (i.e. just "ru" for Russian,
-# "eo" for Esperanto).
-#
-# If you are interested in contributing new translations or have corrections
-# to the existing translations, see 
-# http://code.google.com/p/rubycas-server/wiki/HowToContribueTranslations
-#
-default_locale: en
-
-
-
 ##### LOGGING ##################################################################
 
 # Configure general logging. This log is where you'll want to look in case of 
 # problems.
 #
-# You may want to change the file to something like /var/log/casserver.log
 # Set the level to DEBUG if you want more detailed logging.
 
-log:
-  file: log/casserver.log
-  level: DEBUG
-
-
-# If you want full database logging, uncomment this next section.
-# Every SQL query will be logged here. This is useful for debugging database 
-# problems.
-#
-db_log:
-  file: /var/log/casserver_db.log
-
+log_level: DEBUG
 
 
 ##### SINGLE SIGN-OUT ##########################################################

@@ -1,17 +1,20 @@
 # encoding: utf-8
 
+require "log4r"
+require 'log4r/formatter/patternformatter'
+
+
+
 CONFIG_FILE = ENV['CONFIG_FILE'] || "#{::Rails.root.to_s}/config/cas.yml"
+
 
 RoodoCasServer::Application.config.cas_config = HashWithIndifferentAccess.new(
   :maximum_unused_login_ticket_lifetime => 5.minutes,
   :maximum_unused_service_ticket_lifetime => 5.minutes, # CAS Protocol Spec, sec. 3.2.1 (recommended expiry time)
-  :maximum_session_lifetime => 1.month,                 # all tickets are deleted after this period of time
-  :log => {
-      :file => 'casserver.log', 
-      :level => 'DEBUG'},
-  :uri_path => "/server"
+  :maximum_session_lifetime => 1.month                  # all tickets are deleted after this period of time
 )
 CasConf = RoodoCasServer::Application.config.cas_config
+
 
 def load_config_file(config_file)
   begin
@@ -36,16 +39,38 @@ def load_config_file(config_file)
   CasConf.merge! HashWithIndifferentAccess.new(YAML.load(config_file))
 end
 
-def init_logger
-  if CasConf[:log]
-    if CasConf[:log][:file]
-      Rails.logger.debug "Redirecting log to #{CasConf[:log][:file]}"
-      Rails.logger = Logger.new(CasConf[:log][:file])
+def init_logger 
+  Rails.logger = Log4r::Logger.new("")
+  #Rails.logger.trace = true
+  
+  if CasConf[:log_level]
+    case CasConf[:log_level].upcase
+      when "DEBUG"  
+        Rails.logger.level = Log4r::DEBUG    
+      when "INFO"   
+        Rails.logger.level = Log4r::INFO
+      when "WARN"   
+        Rails.logger.level = Log4r::WARN
+      when "ERROR"  
+        Rails.logger.level = Log4r::ERROR
+      when "FATAL"  
+        Rails.logger.level = Log4r::FATAL        
     end
-    Rails.logger.debug "TEST"
-    Rails.logger.level = Logger.const_get(CasConf[:log][:level]) if CasConf[:log][:level]
+  else
+    Rails.logger.level = Log4r::WARN
   end
+  
+  # Log4r::StderrOutputter.new "console"
+  Log4r::FileOutputter.new("logfile", 
+    :filename => "log/#{RAILS_ENV}.log", 
+    :trunc => true,
+    :trace => true,
+    :formatter => Log4r::PatternFormatter.new(:pattern => "[%d] %5l -- : %1M"))
+    #:formatter => Log4r::PatternFormatter.new(:pattern => "[%d] %t %5l -- : %1M"))
+    
+  Rails.logger.add("logfile")
 end
+
 
 def init_authenticators
   auth = []
@@ -63,7 +88,7 @@ def init_authenticators
           # config.yml explicitly names source file
           require authenticator[:source]
         else
-          # the authenticator class hasn't yet been loaded, so lets try to load it from the casserver/authenticators directory
+          # the authenticator class hasn't yet been loaded, so lets try to load it from the lib/authenticators directory
           auth_rb = authenticator[:class].underscore.gsub('cas_server/', '')
           require auth_rb
         end
@@ -74,7 +99,7 @@ def init_authenticators
         # config.yml explicitly names source file
         require CasConf[:authenticator][:source]
       else
-        # the authenticator class hasn't yet been loaded, so lets try to load it from the casserver/authenticators directory
+        # the authenticator class hasn't yet been loaded, so lets try to load it from the lib/authenticators directory
         auth_rb = CasConf[:authenticator][:class].underscore.gsub('cas_server/', '')
         require auth_rb
       end
@@ -93,6 +118,8 @@ def init_authenticators
 
   RoodoCasServer::Application.config.auth = auth
 end
+
+
 
 load_config_file(CONFIG_FILE)
 init_logger
