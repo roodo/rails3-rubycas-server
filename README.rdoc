@@ -19,6 +19,32 @@ A clone of the rubycas-server, providing a cross-domain single sign-on solution 
 
 == INSTALL:
 
+You chould configure the config/database.yml for your Database.
+  development: &default
+    adapter: mysql2
+    encoding: utf8
+    reconnect: false
+    database: roodo_cas_development
+    pool: 5
+    username:
+    password:
+    host:
+   
+Then, we use unicorn to be the default web server. So, You need to configure the config/unicorn.rb to specify the listen port, log path etc...
+  ENV['RAILS_ENV'] = 'development'
+  worker_processes 1
+  listen 3000, :tries => 200
+  timeout 30
+
+  root = File.expand_path(File.dirname(__FILE__)).split('/')[0..-2].join('/')
+  pid(root + '/tmp/pids/unicorn.pid')
+  working_directory root
+  stderr_path(root + '/log/unicorn.stderr.log')
+  stdout_path(root + '/log/unicorn.stdout.log')
+  
+After above, type the following command to start the server.
+  ./bin/start
+
 == Use SQLEncrypted Authenticator
 
 You need to find out and modify the configuration that look something like following (by default located in /config/cas.yml).
