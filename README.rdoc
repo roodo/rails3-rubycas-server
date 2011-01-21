@@ -30,8 +30,12 @@ You chould configure the config/database.yml for your Database.
     username:
     password:
     host:
-   
-Then, we use unicorn to be the default web server. So, You need to configure the config/unicorn.rb to specify the listen port, log path etc...
+    
+Then, run following commands to install dependencies and generate the necessary database schema.
+  bundle install
+  rake db:migrate
+  
+We use unicorn to be the default web server. So, You need to configure the config/unicorn.rb to specify the listen port, log path etc...
   ENV['RAILS_ENV'] = 'development'
   worker_processes 1
   listen 3000, :tries => 200
@@ -44,7 +48,6 @@ Then, we use unicorn to be the default web server. So, You need to configure the
   stdout_path(root + '/log/unicorn.stdout.log')
   
 After above, type the following command to start the server.
-  bundle install
   ./bin/start
 
 == Use SQLEncrypted Authenticator
