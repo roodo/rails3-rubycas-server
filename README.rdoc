@@ -12,12 +12,13 @@ A clone of the rubycas-server, providing a cross-domain single sign-on solution 
 
 == REQUIREMENTS:
 
-* gem install rails ( > 3.0.3 )
+* gem install rails
 * gem install mysql2
-* gem install crypt-isaac ( ~> 0.9.1 )
-* gem install gettext ( ~> 2.1.0 )
+* gem install crypt-isaac
+* gem install gettext
+* gem install unicorn
 
-== INSTALL:
+== Installation & Usage:
 
 You chould configure the config/database.yml for your Database.
   development: &default
@@ -43,6 +44,7 @@ Then, we use unicorn to be the default web server. So, You need to configure the
   stdout_path(root + '/log/unicorn.stdout.log')
   
 After above, type the following command to start the server.
+  bundle install
   ./bin/start
 
 == Use SQLEncrypted Authenticator
