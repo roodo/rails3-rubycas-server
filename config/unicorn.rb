@@ -2,9 +2,8 @@
 
 
 ENV['RAILS_ENV'] = 'development'
-worker_processes 1
-listen 3000, :tries => 200
-
+worker_processes 2
+listen 3000, :tries => 5
 timeout 30
 
 root = File.expand_path(File.dirname(__FILE__)).split('/')[0..-2].join('/')
