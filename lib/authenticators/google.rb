@@ -22,8 +22,8 @@ class CASServer::Authenticators::Google < CASServer::Authenticators::Base
     }
 
     url = URI.parse('https://www.google.com/accounts/ClientLogin')
-    if $CONF.proxy_host
-      http = Net::HTTP.Proxy($CONF.proxy_host, $CONF.proxy_port, $CONF.proxy_username, $CONF.proxy_password).new(url.host, url.port)
+    if CasConf[:proxy_host]
+      http = Net::HTTP.Proxy(CasConf[:proxy_host], CasConf[:proxy_port], CasConf[:proxy_username], CasConf[:proxy_password]).new(url.host, url.port)
     else
       http = Net::HTTP.new(url.host, url.port)
     end
