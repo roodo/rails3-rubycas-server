@@ -45,12 +45,12 @@ class CASServer::Authenticators::Google < CASServer::Authenticators::Base
         when Net::HTTPForbidden
           false
         else
-          $LOG.error("Unexpected response from Google while validating credentials: #{res.inspect} ==> #{res.body}.")
+          Rails.logger.error("Unexpected response from Google while validating credentials: #{res.inspect} ==> #{res.body}.")
           raise CASServer::AuthenticatorError, "Unexpected response received from Google while validating credentials."
         end
       end
     rescue Timeout::Error
-      $LOG.error("Google did not respond to the credential validation request. We waited for #{wait_seconds.inspect} seconds before giving up.")
+      Rails.logger.error("Google did not respond to the credential validation request. We waited for #{wait_seconds.inspect} seconds before giving up.")
       raise CASServer::AuthenticatorError, "Timeout while waiting for Google to validate credentials."
     end
 
