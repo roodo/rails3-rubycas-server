@@ -10,7 +10,6 @@ require 'timeout'
 class CASServer::Authenticators::Google < CASServer::Authenticators::Base
   def validate(credentials)
     read_standard_credentials(credentials)
-
     return false if @username.blank? || @password.blank?
 
     auth_data = {
@@ -20,11 +19,21 @@ class CASServer::Authenticators::Google < CASServer::Authenticators::Base
       'source'  => 'RubyCAS-Server',
       'accountType' => 'HOSTED_OR_GOOGLE'
     }
-
+    
     url = URI.parse('https://www.google.com/accounts/ClientLogin')
     if CasConf[:proxy_host]
-      http = Net::HTTP.Proxy(CasConf[:proxy_host], CasConf[:proxy_port], CasConf[:proxy_username], CasConf[:proxy_password]).new(url.host, url.port)
+      Rails.logger.debug("proxy_host: #{CasConf[:proxy_host]}")
+      Rails.logger.debug("proxy_port: #{CasConf[:proxy_port]}")
+      Rails.logger.debug("proxy_username: #{CasConf[:proxy_username]}")
+      Rails.logger.debug("proxy_password: #{CasConf[:proxy_password]}")
+      
+      http = Net::HTTP.Proxy(
+        CasConf[:proxy_host], 
+        CasConf[:proxy_port], 
+        CasConf[:proxy_username], 
+        CasConf[:proxy_password]).new(url.host, url.port)
     else
+      Rails.logger.debug("url.host: #{url.host}, url.port: #{url.port}")
       http = Net::HTTP.new(url.host, url.port)
     end
     http.use_ssl = true
