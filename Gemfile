@@ -30,6 +30,7 @@ gem 'unicorn', '2.0.0'
 #   gem 'webrat'
 # end
 
-gem "crypt-isaac", "~> 0.9.1"
-gem "gettext", "~> 2.1.0"
-gem "log4r"
+gem 'crypt-isaac', '~> 0.9.1'
+gem 'gettext', '~> 2.1.0'
+gem 'log4r'
+gem 'gdata'
