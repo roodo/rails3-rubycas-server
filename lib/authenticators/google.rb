@@ -1,67 +1,41 @@
+#encoding: utf-8
+
 require 'authenticators/base'
 require 'uri'
 require 'net/http'
 require 'net/https'
 require 'timeout'
+require 'gdata'
 
 # Validates Google accounts against Google's authentication service -- in other
-# words, this authenticator allows users to log in to CAS using their
-# Gmail/Google accounts.
+# words, this authenticator allows users to log in to CAS using their Gmail/Google accounts.
 class CASServer::Authenticators::Google < CASServer::Authenticators::Base
+
   def validate(credentials)
     read_standard_credentials(credentials)
-    return false if @username.blank? || @password.blank?
+    raise_if_not_configured
 
-    auth_data = {
-      'Email'   => @username,
-      'Passwd'  => @password,
-      'service' => 'xapi',
-      'source'  => 'RubyCAS-Server',
-      'accountType' => 'HOSTED_OR_GOOGLE'
-    }
+    Rails.logger.debug "@username: #{@username}"
+    Rails.logger.debug "@password: #{@password}"
     
-    url = URI.parse('https://www.google.com/accounts/ClientLogin')
-    if CasConf[:proxy_host]
-      Rails.logger.debug("proxy_host: #{CasConf[:proxy_host]}")
-      Rails.logger.debug("proxy_port: #{CasConf[:proxy_port]}")
-      Rails.logger.debug("proxy_username: #{CasConf[:proxy_username]}")
-      Rails.logger.debug("proxy_password: #{CasConf[:proxy_password]}")
+    begin    
+      client_login_handler = GData::Auth::ClientLogin.new('writely', :account_type => 'HOSTED')
       
-      http = Net::HTTP.Proxy(
-        CasConf[:proxy_host], 
-        CasConf[:proxy_port], 
-        CasConf[:proxy_username], 
-        CasConf[:proxy_password]).new(url.host, url.port)
-    else
-      Rails.logger.debug("url.host: #{url.host}, url.port: #{url.port}")
-      http = Net::HTTP.new(url.host, url.port)
+      token = client_login_handler.get_token(@username, @password, 'google-RailsArticleSample-v1')
+      Rails.logger.debug "google token: #{token}"
+      
+      client = GData::Client::Base.new(:auth_handler => client_login_handler)
+    rescue
+      return false
     end
-    http.use_ssl = true
-
-    # TODO: make the timeout configurable
-    wait_seconds = 10
-    begin
-      timeout(wait_seconds) do
-        res = http.start do |conn|
-          req = Net::HTTP::Post.new(url.path)
-          req.set_form_data(auth_data,'&')
-          conn.request(req)
-        end
-
-        case res
-        when Net::HTTPSuccess
-          true
-        when Net::HTTPForbidden
-          false
-        else
-          Rails.logger.error("Unexpected response from Google while validating credentials: #{res.inspect} ==> #{res.body}.")
-          raise CASServer::AuthenticatorError, "Unexpected response received from Google while validating credentials."
-        end
-      end
-    rescue Timeout::Error
-      Rails.logger.error("Google did not respond to the credential validation request. We waited for #{wait_seconds.inspect} seconds before giving up.")
-      raise CASServer::AuthenticatorError, "Timeout while waiting for Google to validate credentials."
-    end
-
+    
+    return true
   end
+  
+  def raise_if_not_configured
+    raise CASServer::AuthenticatorError.new(
+      "Cannot validate credentials because the authenticator hasn't yet been configured"
+    ) unless @options
+  end
+  
 end
