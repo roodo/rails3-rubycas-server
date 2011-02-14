@@ -1,24 +1,16 @@
-= roodo-cas-server beta
+= rails3-rubycas-server
 
-by JUT Living Development Co., Ltd
+by JUT Living Development Co., Ltd ( http://www.roodo.com )
 
 == LINKS:
 
-* {github}[https://github.com/wuhsien/roodo-cas-server]
+* {github}[https://github.com/roodo/rails3-rubycas-server]
 
 == DESCRIPTION:
 
 A clone of the rubycas-server, providing a cross-domain single sign-on solution for web applications using Rails3.
 
-== REQUIREMENTS:
-
-* gem install rails
-* gem install mysql2
-* gem install crypt-isaac
-* gem install gettext
-* gem install unicorn
-
-== Installation & Usage:
+== Installation:
 
 You chould configure the config/database.yml for your Database.
   development: &default
