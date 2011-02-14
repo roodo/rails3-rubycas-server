@@ -10,6 +10,11 @@ by JUT Living Development Co., Ltd ( http://www.roodo.com )
 
 A clone of the rubycas-server, providing a cross-domain single sign-on solution for web applications using Rails3.
 
+== FEATURES:
+
+* Plugable Module
+* With authentication module for Facebook, Google and Yahoo!
+
 == Installation:
 
 You chould configure the config/database.yml for your Database.
