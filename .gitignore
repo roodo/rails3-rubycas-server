@@ -4,3 +4,5 @@ log/*.log
 tmp/**/*
 .project
 Gemfile.lock
+config/cas.yml
+config/database.yml
