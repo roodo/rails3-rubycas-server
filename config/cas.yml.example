@@ -112,36 +112,6 @@ authenticator:
 #   username_column: username
 #   encrypt_function: 'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
 #
-# === Google Authentication ====================================================
-#
-# The Google authenticator allows users to log in to your CAS server using
-# their Google account credentials (i.e. the same email and password they
-# would use to log in to Google services like Gmail). This authenticator
-# requires no special configuration -- just specify its class name:
-#
-#authenticator:
-#  class: CASServer::Authenticators::Google
-#
-# Note that as with all authenticators, it is possible to use the Google 
-# authenticator alongside other authenticators. For example, CAS can first
-# attempt to validate the account with Google, and if that fails, fall back
-# to some other local authentication mechanism.
-#
-# For example:
-#
-# authenticator:
-#   - class: CASServer::Authenticators::Google
-#   - class: CASServer::Authenticators::SQL
-#     database:
-#       adapter: mysql
-#       database: some_database_with_users_table
-#       username: root
-#       password:
-#       host: localhost
-#     user_table: users
-#     username_column: username
-#     password_column: password
-
 
 ##### LOOK & FEEL ##############################################################
 
