@@ -34,6 +34,10 @@ gem 'crypt-isaac', '~> 0.9.1'
 gem 'gettext', '~> 2.1.0'
 gem 'log4r'
 
+# Add for Google authenticator client
+#gem 'gdata_19'
+
+# Add for Facebook client
 gem 'rest-graph'
 gem 'rest-client', '>=1.6'
-gem 'json'
+gem 'json' 
