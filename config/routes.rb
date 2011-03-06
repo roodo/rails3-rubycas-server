@@ -64,4 +64,5 @@ RoodoCasServer::Application.routes.draw do
   match "#{CasConf["uri_path"]}/serviceValidate", :to => "server#serviceValidate", :get => "get"
   match "#{CasConf["uri_path"]}/proxyValidate", :to => "server#proxyValidate", :get => "get"
   match "#{CasConf["uri_path"]}/proxy", :to => "server#proxy", :get => "get"
+  match "#{CasConf["uri_path"]}/facebook", :to => "server#facebook", :get => "get"
 end
