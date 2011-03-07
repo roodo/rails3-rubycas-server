@@ -2,13 +2,16 @@
 
 require "utils"
 require "cas"
-
+require 'authenticators/facebook'
 
 class ServerController < ApplicationController
 
   include CASServer::CAS
   before_filter :set_settings
   
+  include RestGraph::RailsUtil
+  before_filter :filter_setup_rest_graph, :only => [:facebook]
+
   def set_settings
     response.headers['Content-Type'] = 'text/html; charset=UTF-8'
     @theme = CasConf[:theme] if CasConf[:theme]
@@ -364,4 +367,111 @@ class ServerController < ApplicationController
     end
   end
   
+  def facebook 
+    CASServer::Utils::log_controller_action(self.class, params)
+    
+    # Get user's fb data
+    fb_rs = rest_graph.get('me')
+    
+    # 2.2.1 (optional)
+    @service = clean_service_url(params['service'])
+    @lt = params['lt']
+    @email = fb_rs['email']
+    
+    # Remove leading and trailing widespace from email.
+    @email.strip! if @email
+    
+    if @email && CasConf[:downcase_username]
+      Rails.logger.debug("Converting email #{@email.inspect} to lowercase because 'downcase_username' option is enabled.")
+      @email.downcase!
+    end
+    
+    if error = validate_login_ticket(@lt)
+      @message = {:type => 'mistake', :message => error}
+      # generate another login ticket to allow for re-submitting the form
+      @lt = generate_login_ticket.ticket
+      return render :index, :status => 401
+    end
+    
+    # generate another login ticket to allow for re-submitting the form after a post
+    @lt = generate_login_ticket.ticket
+    Rails.logger.debug("Logging in with email: #{@email}, lt: #{@lt}, service: #{@service}, auth: #{Auth.inspect}")
+    
+    credentials_are_valid = false
+    extra_attributes = {}
+    successful_authenticator = nil
+    begin
+      auth = CASServer::Authenticators::Facebook.new
+      credentials_are_valid = auth.validate(:email => @email)
+      
+      if credentials_are_valid
+        successful_authenticator = auth
+      end
+    rescue CASServer::AuthenticatorError => e
+      Rails.logger.debug(e)
+      @message = {:type => 'mistake', :message => e.to_s}
+      return render :index
+    end
+    
+    if credentials_are_valid
+      Rails.logger.info("Credentials for email '#{@email}' successfully validated using #{successful_authenticator.class.name}.")
+      Rails.logger.debug("Authenticator provided additional user attributes: #{extra_attributes.inspect}") unless extra_attributes.blank?
+
+      # 3.6 (ticket-granting cookie)
+      tgt = generate_ticket_granting_ticket(@email, extra_attributes)
+      
+      if CasConf[:maximum_session_lifetime]
+        expires = CasConf[:maximum_session_lifetime].to_i.from_now
+        expiry_info = " It will expire on #{expires}."
+        response.set_cookie('tgt', {
+          :value => tgt.to_s,
+          :expires => expires
+        })
+      else
+        expiry_info = " It will not expire."
+        response.set_cookie('tgt', tgt.to_s)
+      end
+
+      Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@email.inspect}. #{expiry_info}")
+
+      if @service.blank?
+        Rails.logger.info("Successfully authenticated user '#{@email}' at '#{tgt.client_hostname}'. No service param was given, so we will redirect to demo page.")
+        @message = {:type => 'confirmation', :message => "You have successfully logged in."}
+      else
+        @st = generate_service_ticket(@service, @email, tgt)
+
+        begin
+          service_with_ticket = service_uri_with_ticket(@service, @st)
+          Rails.logger.info("Redirecting authenticated user '#{@email}' at '#{@st.client_hostname}' to service '#{@service}'")
+          #redirect service_with_ticket, 303 # response code 303 means "See Other" (see Appendix B in CAS Protocol spec)
+          return redirect_to service_with_ticket, :status => 303
+        rescue URI::InvalidURIError
+          Rails.logger.error("The service '#{@service}' is not a valid URI!")
+          @message = {
+            :type => 'mistake',
+            :message => "The target service your browser supplied appears to be invalid. Please contact your system administrator for help."
+          }
+        end
+      end
+    else
+      Rails.logger.warn("Invalid credentials given for user '#{@email}'")
+      @message = {:type => 'mistake', :message => "Incorrect email or password."}
+      return render :index, :status => 401
+    end
+    
+    render :index
+  end
+
+  private
+  def filter_setup_rest_graph
+    Rails.logger.debug 'rest_graph_setup!'
+    rest_graph_setup(
+      :auto_authorize => true, 
+      :auto_authorize_scope   => 'email', 
+      :ensure_authorized => true,
+      :write_session => true,
+      :write_cookies => true
+    )
+  end
+
 end

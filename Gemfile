@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.3'
+gem 'rails'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -33,4 +33,11 @@ gem 'unicorn', '2.0.0'
 gem 'crypt-isaac', '~> 0.9.1'
 gem 'gettext', '~> 2.1.0'
 gem 'log4r'
-gem 'gdata_19'
+
+# Add for Google authenticator client
+#gem 'gdata_19'
+
+# Add for Facebook client
+gem 'rest-graph'
+gem 'rest-client', '>=1.6'
+gem 'json' 

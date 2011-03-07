@@ -1,0 +1,9 @@
+development:
+  app_id: 'put ypur facebook App Id here'
+  secret: 'put your facebook App Secret here'
+  callback_host: 'put your site url here'    
+
+production:
+  app_id: 'put ypur facebook App Id here'
+  secret: 'put your facebook App Secret here'
+  callback_host: 'put your site url here'
