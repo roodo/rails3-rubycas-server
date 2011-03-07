@@ -2,8 +2,12 @@
 /* CSS Document */
 
 
+
+html {
+  border-top: 7px solid #D8D8D8;
+}
 body {
-  margin-top: 80px;
+  margin-top: 100px;
   -x-system-font: none;
   font-family: arial,helvetica,clean,sans-serif;
   font-size: 12px;
@@ -67,7 +71,7 @@ div#right-splash {
   float: right;
   width: 450px;
   padding: 10px 0 0 50px;
-  border-left: 7px solid #D8D8D8;
+  border-left: 5px solid #D8D8D8;
   color: #666;
 }
 div#right-splash h2 {
