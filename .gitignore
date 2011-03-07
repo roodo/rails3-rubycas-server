@@ -6,3 +6,6 @@ tmp/**/*
 Gemfile.lock
 config/cas.yml
 config/database.yml
+config/rest-graph.yaml
+restart
+tmp/restart.txt
