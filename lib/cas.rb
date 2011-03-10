@@ -2,12 +2,12 @@
 
 require 'uri'
 require 'net/https'
-require 'model'
+#require 'model'
 
 
 module CASServer::CAS
   
-  include CASServer::Model
+  #include CASServer::Model
 
   def generate_login_ticket
     lt = LoginTicket.new
