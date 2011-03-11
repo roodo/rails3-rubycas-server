@@ -6,8 +6,6 @@ require 'model'
 
 
 module CASServer::CAS
-  
-  #include CASServer::Model
 
   def generate_login_ticket
     lt = LoginTicket.new
@@ -48,7 +46,8 @@ module CASServer::CAS
     st.username = username
     st.granted_by_tgt_id = tgt.id
     st.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
-
+    st.save!
+    
     Rails.logger.info("Generated service ticket '#{st.ticket}' for service '#{st.service}'" +
       " for user '#{st.username}' at '#{st.client_hostname}'")
     st
@@ -64,6 +63,7 @@ module CASServer::CAS
     pt.granted_by_tgt_id = pgt.service_ticket.granted_by_tgt.id
     pt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
     pt.save!
+    
     Rails.logger.debug("Generated proxy ticket '#{pt.ticket}' for target service '#{pt.service}'" +
       " for user '#{pt.username}' at '#{pt.client_hostname}' using proxy-granting" +
       " ticket '#{pgt.ticket}'")
@@ -114,7 +114,6 @@ module CASServer::CAS
   end
   
   def validate_login_ticket(ticket)
-    # $LOG.debug("Validating login ticket '#{ticket}'")
     Rails.logger.info("Validating login ticket '#{ticket}'")
 
     success = false
@@ -177,7 +176,6 @@ module CASServer::CAS
       if st.consumed?
         error = Error.new(:INVALID_TICKET, "Ticket '#{ticket}' has already been used up.")
         Rails.logger.warn "#{error.code} - #{error.message}"
-      #elsif st.kind_of?(CASServer::Model::ProxyTicket) && !allow_proxy_tickets
       elsif st.kind_of?(ProxyTicket) && !allow_proxy_tickets
         error = Error.new(:INVALID_TICKET, "Ticket '#{ticket}' is a proxy ticket, but only service tickets are allowed here.")
         Rails.logger.warn "#{error.code} - #{error.message}"
@@ -207,7 +205,6 @@ module CASServer::CAS
   def validate_proxy_ticket(service, ticket)
     pt, error = validate_service_ticket(service, ticket, true)
 
-    #if pt.kind_of?(CASServer::Model::ProxyTicket) && !error
     if pt.kind_of?(ProxyTicket) && !error
       if not pt.granted_by_pgt
         error = Error.new(:INTERNAL_ERROR, "Proxy ticket '#{pt}' belonging to user '#{pt.username}' is not associated with a proxy granting ticket.")
