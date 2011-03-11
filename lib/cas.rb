@@ -46,6 +46,7 @@ module CASServer::CAS
     st.username = username
     st.granted_by_tgt_id = tgt.id
     st.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
+    st.type = "ServiceTicket"
     st.save!
     
     Rails.logger.info("Generated service ticket '#{st.ticket}' for service '#{st.service}'" +
@@ -182,7 +183,8 @@ module CASServer::CAS
       elsif Time.now - st.created_on > CasConf[:maximum_unused_service_ticket_lifetime]
         error = Error.new(:INVALID_TICKET, "Ticket '#{ticket}' has expired.")
         Rails.logger.warn "Ticket '#{ticket}' has expired."
-      elsif !st.matches_service? service
+      #elsif !st.matches_service? service
+      elsif st.service != service
         error = Error.new(:INVALID_SERVICE, "The ticket '#{ticket}' belonging to user '#{st.username}' is valid,"+
           " but the requested service '#{service}' does not match the service '#{st.service}' associated with this ticket.")
         Rails.logger.warn "#{error.code} - #{error.message}"
