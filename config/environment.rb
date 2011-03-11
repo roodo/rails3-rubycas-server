@@ -6,4 +6,4 @@ require File.expand_path('../application', __FILE__)
 RoodoCasServer::Application.initialize!
 
 # 20100304
-require 'rest-graph/auto_load'
+require 'rest-graph'
