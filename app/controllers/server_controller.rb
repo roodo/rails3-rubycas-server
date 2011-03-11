@@ -223,11 +223,11 @@ class ServerController < ApplicationController
     @continue_url = params['url']
     @gateway = params['gateway'] == 'true' || params['gateway'] == '1'
 
-    tgt = CASServer::Model::TicketGrantingTicket.find_by_ticket(request.cookies['tgt'])
+    tgt = TicketGrantingTicket.find_by_ticket(request.cookies['tgt'])
     response.delete_cookie 'tgt'
 
     if tgt
-      CASServer::Model::TicketGrantingTicket.transaction do
+      TicketGrantingTicket.transaction do
         Rails.logger.debug("Deleting Service/Proxy Tickets for '#{tgt}' for user '#{tgt.username}'")
         tgt.granted_service_tickets.each do |st|
           send_logout_notification_for_service_ticket(st) if config[:enable_single_sign_out]
@@ -237,8 +237,8 @@ class ServerController < ApplicationController
           st.destroy
         end
 
-        pgts = CASServer::Model::ProxyGrantingTicket.find(:all,
-          :conditions => [CASServer::Model::Base.connection.quote_table_name(CASServer::Model::ServiceTicket.table_name)+".username = ?", tgt.username],
+        pgts = ProxyGrantingTicket.find(:all,
+          :conditions => ["service_tickets.username = ?", tgt.username],
           :include => :service_ticket)
         pgts.each do |pgt|
           Rails.logger.debug("Deleting Proxy-Granting Ticket '#{pgt}' for user '#{pgt.service_ticket.username}'")
@@ -331,7 +331,7 @@ class ServerController < ApplicationController
     @extra_attributes = {}
     if @success
       @username = t.username
-      if t.kind_of? CASServer::Model::ProxyTicket
+      if t.kind_of? ProxyTicket
         @proxies << t.granted_by_pgt.service_ticket.service
       end
      
