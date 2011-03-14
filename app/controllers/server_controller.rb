@@ -261,7 +261,7 @@ class ServerController < ApplicationController
     Rails.logger.debug "@continue_url: #{@continue_url}"
     
     if @gateway && @service
-      return redirect @service, :status => 303
+      return redirect_to @service, :status => 303
     elsif @continue_url
       return render :logout
     else
@@ -318,14 +318,24 @@ class ServerController < ApplicationController
     # required
     @service = clean_service_url(params['service'])
     @ticket = params['ticket']
+    
+    Rails.logger.debug "@service: #{@service}"
+    Rails.logger.debug "@ticket: #{@ticket}"
      
     # optional
     @pgt_url = params['pgtUrl']
     @renew = params['renew']
+    
+    Rails.logger.debug "@pgt_url: #{@pgt_url}"
+    Rails.logger.debug "@renew: #{@renew}"
      
     @proxies = []
      
     t, @error = validate_proxy_ticket(@service, @ticket)
+    
+    Rails.logger.debug "@error: #{@error}"
+    Rails.logger.debug "t: #{t}"
+    
     @success = t && !@error
      
     @extra_attributes = {}
