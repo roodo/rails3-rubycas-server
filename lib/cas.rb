@@ -2,7 +2,7 @@
 
 require 'uri'
 require 'net/https'
-require 'model'
+#require 'model'
 
 
 module CASServer::CAS
