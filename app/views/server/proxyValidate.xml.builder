@@ -1,4 +1,4 @@
-xml.instruct!
+#xml.instruct!
 if @success
   xml.tag!("cas:serviceResponse", 'xmlns:cas' => "http://www.yale.edu/tp/cas") do
     xml.tag!("cas:authenticationSuccess") do

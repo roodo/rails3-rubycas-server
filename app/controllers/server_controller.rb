@@ -181,7 +181,7 @@ class ServerController < ApplicationController
           response.set_cookie('tgt', tgt.to_s)
         end
       end
-
+      
       Rails.logger.debug("Ticket granting cookie '#{request.cookies['tgt'].inspect}' granted to #{@username.inspect}. #{expiry_info}")
 
       if @service.blank?
