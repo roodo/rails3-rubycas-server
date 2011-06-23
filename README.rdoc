@@ -7,7 +7,7 @@ Other portions are copyright of their respective authors.
 
 == Authors
 
-See http://github.com/gunark/rubycas-server/commits/
+See http://github.com/gunark/rubycas-server/commits
 
 == DESCRIPTION:
 
@@ -15,66 +15,7 @@ A clone of the rubycas-server, providing a cross-domain single sign-on solution 
 
 == FEATURES:
 
-* Plugable Module
 * With authentication module for Facebook, Google and Yahoo!
-
-== Installation:
-
-You chould configure the config/database.yml for your Database.
-  development: &default
-    adapter: mysql2
-    encoding: utf8
-    reconnect: false
-    database: roodo_cas_development
-    pool: 5
-    username:
-    password:
-    host:
-    
-Then, run following commands to install dependencies and generate the necessary database schema.
-  bundle install
-  rake db:migrate
-  
-We use unicorn to be the default web server. So, You need to configure the config/unicorn.rb to specify something look like listen port, log path etc.  
-After above, type the following command to start the server.
-  ./bin/start
-
-== Use SQLEncrypted Authenticator
-
-You need to find out and modify the configuration that look something like following (by default located in /config/cas.yml).
-  authenticator:
-    class: CASServer::Authenticators::SQLEncrypted
-    database:
-      adapter: mysql2
-      database: some_database_with_users_table
-      username: 
-      password: 
-      host: 
-    user_table: users
-    username_column: email_address
-    encrypt_function: 'user.encrypted_password == Digest::SHA256.hexdigest("#{user.encryption_salt}::#{@password}")'
-The default value of encrypt_function is 
-  'user.encrypted_password == Digest::SHA256.hexdigest("#{user.encryption_salt}::#{@password}")'
-You can modify it to suit your app, it will look like following (use SHA1 for example)
-  'user.encrypted_password == Digest::SHA1.hexdigest("#{user.encryption_salt}::#{@password}")'
-
-== Use SQLMd5 Authenticator
-  
-Modify your Authenticators Class in configuration file (by default located in /config/cas.yml).
-  class: CASServer::Authenticators::SQLMd5
-And your configuration should look something like following
-  authenticator:
-    class: CASServer::Authenticators::SQLMd5
-    database:
-      adapter: mysql2
-      database: some_database_with_users_table
-      username: 
-      password: 
-      host: 
-    user_table: users
-    username_column: username
-    password_column: password
-    extra_attributes: username, email, birthday
 
 == License
 
